@@ -1,14 +1,22 @@
+mod commands;
+mod entities;
+
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, Position, Size};
-
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use specta_typescript::Typescript;
+use tauri_specta::{collect_commands, Builder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let builder = Builder::<tauri::Wry>::new().commands(collect_commands![
+        commands::get_friends_command,
+        commands::greet_command,
+    ]);
+
+    builder
+        .export(Typescript::default(), "../src/bindings.ts")
+        .expect("Failed to export typescript bindings");
+
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(target_os = "macos")]
@@ -69,7 +77,7 @@ pub fn run() {
             }
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(builder.invoke_handler())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
