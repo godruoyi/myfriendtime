@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+body, html {
+  background-color: transparent;
+  user-select: none;
+  cursor: default;
+  overscroll-behavior: none;
+}
+
 .slider {
   -webkit-appearance: none;
   appearance: none;

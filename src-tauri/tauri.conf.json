@@ -10,13 +10,28 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
+        "label": "main",
         "title": "myfriendtime",
-        "width": 400,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "resizable": false,
+        "width": 350,
         "height": 600
       }
     ],
+    "trayIcon": {
+      "id": "tray-icon",
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "tooltip": "Hello",
+      "menuOnLeftClick": false
+    },
     "security": {
       "csp": null
     }
