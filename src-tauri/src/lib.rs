@@ -1,5 +1,6 @@
 mod commands;
 mod entities;
+mod support;
 
 use specta_typescript::Typescript;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
