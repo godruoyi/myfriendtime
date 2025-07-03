@@ -1,18 +1,19 @@
 mod commands;
 mod entities;
 
+use specta_typescript::Typescript;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, Position, Size};
-use specta_typescript::Typescript;
 use tauri_specta::{collect_commands, Builder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = Builder::<tauri::Wry>::new().commands(collect_commands![
-        commands::get_friends_command,
-        commands::greet_command,
+        commands::get_friends_command::get_friends_command,
+        commands::greet_command::greet_command
     ]);
 
+    #[cfg(debug_assertions)]
     builder
         .export(Typescript::default(), "../src/bindings.ts")
         .expect("Failed to export typescript bindings");
