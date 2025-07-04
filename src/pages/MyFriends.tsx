@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
-import {Friend} from "../bindings.ts";
 import {invoke} from "@tauri-apps/api/core";
 import {Plus, Settings} from "lucide-react";
 import TimeTravel from "../compontents/TimeTravel.tsx";
 import FriendItem from "../compontents/FriendItem.tsx";
 import MyTime from "../compontents/MyTime.tsx";
+import {Friend} from "../types.ts";
 
-import './MyFriends.css'
+import '../assets/css/my_friends.css'
 
 export default function MyFriends() {
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -32,6 +32,15 @@ export default function MyFriends() {
         fetchFriends().then();
     }, []);
 
+    const openSettings = async () => {
+        console.log("xx")
+        try {
+            await invoke('open_settings_window_command');
+        } catch (err) {
+            console.error('failed to open settings:', err);
+        }
+    }
+
     if (loading) {
         return <div className="p-4 text-center">正在加载朋友列表...</div>;
     }
@@ -55,6 +64,7 @@ export default function MyFriends() {
                         <Plus className="w-4 h-4"/>
                     </button>
                     <button
+                        onClick={openSettings}
                         className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-end">
                         <Settings className="w-4 h-4"/>
                     </button>

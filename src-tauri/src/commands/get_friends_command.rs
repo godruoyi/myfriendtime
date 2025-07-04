@@ -3,7 +3,6 @@ use crate::support;
 use tauri::Manager;
 
 #[tauri::command]
-#[specta::specta]
 pub fn get_friends_command(app: tauri::AppHandle) -> Result<Vec<Friend>, String> {
     let data_dir = app
         .path()

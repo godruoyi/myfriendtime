@@ -23,6 +23,16 @@
         "resizable": false,
         "width": 320,
         "height": 600
+      },
+      {
+        "label": "settings",
+        "title": "Settings",
+        "url": "settings.html",
+        "width": 650,
+        "transparent": true,
+        "decorations": true,
+        "visible": false,
+        "center": true
       }
     ],
     "trayIcon": {

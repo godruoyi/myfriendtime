@@ -1,4 +1,4 @@
-#[derive(serde::Serialize, serde::Deserialize, Clone, specta::Type)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct Friend {
     pub id: String,
     pub name: String,
