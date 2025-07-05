@@ -22,16 +22,19 @@
         "alwaysOnTop": true,
         "resizable": false,
         "width": 320,
-        "height": 600
+        "center": false,
+        "minHeight": 500
       },
       {
         "label": "settings",
-        "title": "Settings",
+        "title": "Preferences",
         "url": "settings.html",
-        "width": 650,
-        "transparent": true,
+        "width": 610,
+        "transparent": false,
         "decorations": true,
         "visible": false,
+        "titleBarStyle": "Overlay",
+        "resizable": true,
         "center": true
       }
     ],

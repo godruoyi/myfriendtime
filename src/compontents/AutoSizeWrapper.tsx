@@ -1,13 +1,13 @@
-import React, {useRef, useEffect, useCallback} from 'react';
-import {getCurrentWindow, PhysicalSize} from '@tauri-apps/api/window';
-import {debounce} from "lodash-es";
+import React, { useRef, useEffect, useCallback } from 'react';
+import { getCurrentWindow, PhysicalSize } from '@tauri-apps/api/window';
+import { debounce } from "lodash-es";
 
 interface AutoSizeWrapperProps {
     children: React.ReactNode;
     debounceMs?: number;
 }
 
-const AutoSizeWrapper: React.FC<AutoSizeWrapperProps> = ({children, debounceMs = 50}) => {
+const AutoSizeWrapper: React.FC<AutoSizeWrapperProps> = ({ children, debounceMs = 50 }) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const appWindow = getCurrentWindow();
     const minHeight = 400;
@@ -26,7 +26,7 @@ const AutoSizeWrapper: React.FC<AutoSizeWrapperProps> = ({children, debounceMs =
                         `Resizing: logicalH=${logicalHeight}, scale=${scaleFactor}, physicalH=${finalPhysicalHeight}`
                     );
                     await appWindow.setSize(
-                        new PhysicalSize(currentPhysicalSize.width, finalPhysicalHeight + 50)
+                        new PhysicalSize(currentPhysicalSize.width, finalPhysicalHeight + 0)
                     );
                 }
             } catch (error) {

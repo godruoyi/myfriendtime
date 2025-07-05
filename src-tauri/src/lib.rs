@@ -4,7 +4,8 @@ mod support;
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
-use tauri::{Manager, Position, Size};
+use tauri::Manager;
+use tauri_plugin_positioner::{Position, WindowExt};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -12,14 +13,6 @@ pub fn run() {
         .setup(|app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-
-            let main_window = app.get_window("main").unwrap();
-            let cloned_window = main_window.clone();
-            main_window.on_window_event(move |event| {
-                if let tauri::WindowEvent::Focused(false) = event {
-                    cloned_window.hide().unwrap(); // todo when click setting page should not close main window
-                }
-            });
 
             Ok(())
         })
@@ -43,6 +36,31 @@ pub fn run() {
         .on_tray_icon_event(on_tray_icon_event)
         .on_menu_event(on_menu_event)
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_positioner::init())
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::Focused(false) => {
+                let app_handle = window.app_handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    let is_any_app_window_focused = app_handle
+                        .windows()
+                        .values()
+                        .any(|w| w.is_focused().unwrap_or(false));
+
+                    if !is_any_app_window_focused {
+                        if let Some(main_window) = app_handle.get_window("main") {
+                            main_window.hide().unwrap();
+                        }
+                    }
+                });
+            }
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                if window.label() == "settings" {
+                    api.prevent_close();
+                    window.hide().unwrap();
+                }
+            }
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             commands::greet_command::greet_command,
             commands::get_friends_command::get_friends_command,
@@ -66,6 +84,8 @@ fn on_menu_event(app: &tauri::AppHandle, event: tauri::menu::MenuEvent) {
 }
 
 fn on_tray_icon_event(app: &tauri::AppHandle, event: tauri::tray::TrayIconEvent) {
+    tauri_plugin_positioner::on_tray_event(app, &event);
+
     if let TrayIconEvent::Click {
         id,
         rect,
@@ -80,27 +100,7 @@ fn on_tray_icon_event(app: &tauri::AppHandle, event: tauri::tray::TrayIconEvent)
             if window.is_visible().unwrap() {
                 window.hide().unwrap();
             } else {
-                // todo: replace with tauri_plugin_positioner
-                let scale_factor = window.scale_factor().unwrap_or(1.0);
-
-                let tray_position = match rect.position {
-                    Position::Physical(p) => p,
-                    Position::Logical(p) => p.to_physical(scale_factor),
-                };
-
-                let tray_size = match rect.size {
-                    Size::Physical(s) => s,
-                    Size::Logical(s) => s.to_physical(scale_factor),
-                };
-
-                let window_size = window.outer_size().unwrap();
-                let physical_pos = tauri::PhysicalPosition {
-                    x: tray_position.x + (tray_size.width as i32 / 2)
-                        - (window_size.width as i32 / 2),
-                    y: tray_position.y + tray_size.height as i32,
-                };
-
-                window.set_position(physical_pos).unwrap();
+                window.move_window(Position::TrayBottomCenter).unwrap();
                 window.show().unwrap();
                 window.set_focus().unwrap();
             }

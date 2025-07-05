@@ -1,8 +1,8 @@
 // src/components/AnimatedSizeWrapper.tsx
-import React, {useEffect, useRef} from 'react';
-import {motion, useMotionValue} from 'framer-motion';
-import {getCurrentWindow, PhysicalSize} from '@tauri-apps/api/window';
-import {debounce} from 'lodash-es';
+import React, { useEffect, useRef } from 'react';
+import { motion, useMotionValue } from 'framer-motion';
+import { getCurrentWindow, PhysicalSize } from '@tauri-apps/api/window';
+import { debounce } from 'lodash-es';
 
 const appWindow = getCurrentWindow();
 
@@ -10,18 +10,18 @@ const setTauriWindowSize = debounce(async (physicalHeight: number) => {
     try {
         const currentSize = await appWindow.outerSize();
         if (Math.abs(currentSize.height - physicalHeight) > 2) {
-            await appWindow.setSize(new PhysicalSize(currentSize.width, physicalHeight + 50));
+            await appWindow.setSize(new PhysicalSize(currentSize.width, physicalHeight + 0));
         }
     } catch (e) {
         console.error('Failed to set window size', e);
     }
-}, 16, {leading: false, trailing: true});
+}, 16, { leading: false, trailing: true });
 
 interface AnimatedSizeWrapperProps {
     children: React.ReactNode;
 }
 
-const AnimatedSizeWrapper: React.FC<AnimatedSizeWrapperProps> = ({children}) => {
+const AnimatedSizeWrapper: React.FC<AnimatedSizeWrapperProps> = ({ children }) => {
     const appWindow = getCurrentWindow();
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ const AnimatedSizeWrapper: React.FC<AnimatedSizeWrapperProps> = ({children}) => 
 
     return (
         // 外层容器使用 motion.div，并将其高度绑定到我们的 motion value
-        <motion.div ref={containerRef} style={{height}} className="animated-container">
+        <motion.div ref={containerRef} style={{ height }} className="animated-container">
             {/* 内层容器用于测量实际内容高度 */}
             <div ref={contentRef}>
                 {children}
