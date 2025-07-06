@@ -41,6 +41,15 @@ export default function MyFriends() {
         }
     }
 
+    const newFriend = async () => {
+        try {
+            await invoke<Friend>('open_new_friend_window_command');
+        } catch (err) {
+            console.error('Failed to add friend:', err);
+            setError(typeof err === 'string' ? err : 'Failed to add friend');
+        }
+    }
+
     if (loading) {
         return <div className="p-4 text-center">正在加载朋友列表...</div>;
     }
@@ -59,6 +68,7 @@ export default function MyFriends() {
                 </h1>
                 <div className="flex items-center">
                     <button
+                        onClick={newFriend}
                         className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-end"
                     >
                         <Plus className="w-4 h-4"/>

@@ -54,10 +54,8 @@ pub fn run() {
                 });
             }
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                if window.label() == "settings" {
                     api.prevent_close();
                     window.hide().unwrap();
-                }
             }
             _ => {}
         })
@@ -65,6 +63,7 @@ pub fn run() {
             commands::greet_command::greet_command,
             commands::get_friends_command::get_friends_command,
             commands::open_settings_window_command::open_settings_window_command,
+            commands::open_new_friend_command::open_new_friend_window_command,
             commands::resize_window_command::resize_settings_window,
             commands::resize_window_command::get_window_size,
         ])

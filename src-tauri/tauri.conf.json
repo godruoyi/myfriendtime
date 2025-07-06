@@ -34,7 +34,22 @@
         "decorations": true,
         "visible": false,
         "titleBarStyle": "Overlay",
-        "resizable": true,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "center": true
+      },
+      {
+        "label": "new-friend",
+        "url": "new_friend.html",
+        "width": 500,
+        "title": "",
+        "transparent": false,
+        "decorations": true,
+        "visible": false,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
         "center": true
       }
     ],
