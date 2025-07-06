@@ -61,7 +61,18 @@ jobs:
 
       - name: Update Cargo.toml version
         run: |
-          sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' src-tauri/Cargo.toml
+          # Use a more reliable method to update only the package version
+          awk -v new_ver="${{ github.event.inputs.version }}" '
+          BEGIN { in_package = 0; updated = 0 }
+          /^\[package\]/ { in_package = 1 }
+          /^\[/ && !/^\[package\]/ { in_package = 0 }
+          in_package && /^version = / && !updated {
+              print "version = \"" new_ver "\""
+              updated = 1
+              next
+          }
+          { print }
+          ' src-tauri/Cargo.toml > src-tauri/Cargo.toml.tmp && mv src-tauri/Cargo.toml.tmp src-tauri/Cargo.toml
 
       - name: Update tauri.conf.json version
         run: |

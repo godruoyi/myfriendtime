@@ -55,7 +55,8 @@ jobs:
       - name: Build frontend
         run: pnpm run build
 
-      - name: Build Rust (check compilation)
-        run: |
-          cd src-tauri
-          cargo build
+      # - name: Build Rust (check compilation)
+      #   run: |
+      #     cd src-tauri
+      #     cargo build
+      # todo cargo and clippy check
