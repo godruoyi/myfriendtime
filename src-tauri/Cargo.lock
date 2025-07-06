@@ -2098,7 +2098,7 @@ dependencies = [
 
 [[package]]
 name = "myfriendtime"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "base64 0.21.7",
  "serde",
