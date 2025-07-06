@@ -9,7 +9,7 @@ export default function SettingProfile() {
     const [ownerAvatar, setOwnerAvatar] = useState<string | null>(null)
     const [currentTime, setCurrentTime] = useState("")
     const [timeZone, setTimeZone] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
+    const [_isLoading, setIsLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {

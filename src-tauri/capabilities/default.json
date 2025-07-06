@@ -5,7 +5,7 @@
   "windows": [
     "main",
     "settings",
-    "new-friend"
+    "new_friend"
   ],
   "permissions": [
     "core:default",

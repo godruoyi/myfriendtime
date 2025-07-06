@@ -35,6 +35,7 @@ export default defineConfig(async () => ({
             input: {
                 main: 'index.html',
                 settings: 'settings.html',
+                new_friend: 'new_friend.html',
             }
         }
     }

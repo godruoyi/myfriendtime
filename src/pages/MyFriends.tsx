@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { load } from '@tauri-apps/plugin-store'
-import { Clock, Cog, Plus, Settings } from "lucide-react";
+import { Cog, Plus } from "lucide-react";
 import TimeTravel from "../compontents/TimeTravel.tsx";
 import FriendItem from "../compontents/FriendItem.tsx";
 import MyTime from "../compontents/MyTime.tsx";
@@ -12,8 +12,8 @@ import '../assets/css/my_friends.css'
 
 export default function MyFriends() {
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [_loading, setLoading] = useState<boolean>(true);
+    const [_error, setError] = useState<string | null>(null);
     const [userAvatar, setUserAvatar] = useState<string | null>(null);
     const [userName, setUserName] = useState<string>("Me");
     const currentDate = new Date();
@@ -135,11 +135,6 @@ export default function MyFriends() {
         } catch (err) {
             setError(typeof err === 'string' ? err : 'Failed to add friend');
         }
-    }
-
-    const handleDeleteFriend = (friendId: string) => {
-        // Remove the friend from the local state
-        setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
     }
 
     return (

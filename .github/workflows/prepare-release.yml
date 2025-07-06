@@ -1,0 +1,119 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.2.0)'
+        required: true
+        type: string
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format x.y.z (e.g., 0.2.0)"
+            exit 1
+          fi
+
+      - name: Check if version already exists
+        run: |
+          if git tag | grep -q "^v${{ github.event.inputs.version }}$"; then
+            echo "Error: Version ${{ github.event.inputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Create release branch
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout -b release/v${{ github.event.inputs.version }}
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+      - name: Update Cargo.toml version
+        run: |
+          sed -i 's/version = "[^"]*"/version = "${{ github.event.inputs.version }}"/' src-tauri/Cargo.toml
+
+      - name: Update tauri.conf.json version
+        run: |
+          sed -i 's/"version": "[^"]*"/"version": "${{ github.event.inputs.version }}"/' src-tauri/tauri.conf.json
+
+      - name: Update Cargo.lock
+        run: |
+          cd src-tauri
+          cargo update --package myfriendtime
+
+      - name: Verify changes
+        run: |
+          echo "=== package.json ==="
+          grep '"version"' package.json
+          echo "=== Cargo.toml ==="
+          grep 'version = ' src-tauri/Cargo.toml | head -1
+          echo "=== tauri.conf.json ==="
+          grep '"version"' src-tauri/tauri.conf.json
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+          git push origin release/v${{ github.event.inputs.version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/v${{ github.event.inputs.version }}
+          base: master
+          title: "Release v${{ github.event.inputs.version }}"
+          body: |
+            ## Release v${{ github.event.inputs.version }}
+
+            This PR prepares the release for version ${{ github.event.inputs.version }}.
+
+            ### Changes
+            - Updated version in package.json
+            - Updated version in Cargo.toml
+            - Updated version in tauri.conf.json
+            - Updated Cargo.lock
+
+            ### Next Steps
+            - Review the changes
+            - Merge this PR to trigger the release workflow
+            - The release workflow will automatically build and publish the app
+
+            **⚠️ Merging this PR will trigger an automatic release!**
+          labels: |
+            release
+            automated
+          reviewers: |
+            ${{ github.actor }}

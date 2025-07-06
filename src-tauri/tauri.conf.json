@@ -40,7 +40,7 @@
         "center": true
       },
       {
-        "label": "new-friend",
+        "label": "new_friend",
         "url": "new_friend.html",
         "width": 500,
         "title": "",

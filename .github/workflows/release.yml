@@ -1,0 +1,181 @@
+name: Release Build
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+    paths:
+      - 'package.json'
+      - 'src-tauri/Cargo.toml'
+      - 'src-tauri/tauri.conf.json'
+
+jobs:
+  check-release:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.check.outputs.should-release }}
+      version: ${{ steps.extract-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if this is a release PR
+        id: check
+        run: |
+          if [[ "${{ github.event.pull_request.title }}" =~ ^Release\ v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "should-release=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract version
+        id: extract-version
+        if: steps.check.outputs.should-release == 'true'
+        run: |
+          VERSION=$(grep '"version"' package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
+
+  build-and-release:
+    needs: check-release
+    if: needs.check-release.outputs.should-release == 'true'
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            arch: arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            arch: x64
+
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Tauri App
+        run: |
+          pnpm tauri build --target ${{ matrix.target }} --bundles dmg
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Find DMG file
+        id: find-dmg
+        run: |
+          DMG_PATH=$(find src-tauri/target/${{ matrix.target }}/release/bundle/dmg -name "*.dmg" | head -1)
+          echo "dmg-path=$DMG_PATH" >> $GITHUB_OUTPUT
+          echo "dmg-name=$(basename "$DMG_PATH")" >> $GITHUB_OUTPUT
+          echo "Found DMG: $DMG_PATH"
+
+      - name: Rename DMG with architecture
+        run: |
+          DMG_DIR=$(dirname "${{ steps.find-dmg.outputs.dmg-path }}")
+          DMG_NAME="${{ steps.find-dmg.outputs.dmg-name }}"
+          DMG_BASE="${DMG_NAME%.dmg}"
+          NEW_DMG_NAME="${DMG_BASE}-${{ matrix.arch }}.dmg"
+          mv "${{ steps.find-dmg.outputs.dmg-path }}" "$DMG_DIR/$NEW_DMG_NAME"
+          echo "RENAMED_DMG_PATH=$DMG_DIR/$NEW_DMG_NAME" >> $GITHUB_ENV
+          echo "RENAMED_DMG_NAME=$NEW_DMG_NAME" >> $GITHUB_ENV
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmg-${{ matrix.arch }}
+          path: ${{ env.RENAMED_DMG_PATH }}
+
+  create-release:
+    needs: [check-release, build-and-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Display downloaded artifacts
+        run: |
+          find ./artifacts -type f -name "*.dmg" -ls
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION="v${{ needs.check-release.outputs.version }}"
+          CHANGELOG=$(cat << 'EOF'
+          ## What's New in $VERSION
+
+          ### Features
+          - New features and improvements
+
+          ### Bug Fixes
+          - Bug fixes and stability improvements
+
+          ### Technical Changes
+          - Updated to version ${{ needs.check-release.outputs.version }}
+
+          ### Download
+          - **Intel Macs (x64)**: Download the `-x64.dmg` file
+          - **Apple Silicon Macs (ARM64)**: Download the `-arm64.dmg` file
+
+          ### Installation
+          1. Download the appropriate DMG file for your Mac
+          2. Open the DMG file
+          3. Drag the app to your Applications folder
+          4. The app will be available in your Applications
+          EOF
+          )
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.check-release.outputs.version }}
+          name: Release v${{ needs.check-release.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/dmg-x64/*.dmg
+            artifacts/dmg-arm64/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update latest release
+        run: |
+          echo "✅ Release v${{ needs.check-release.outputs.version }} has been created successfully!"
+          echo "📦 DMG files for both Intel and Apple Silicon Macs have been uploaded."
+          echo "🚀 Users can now download the latest version from the releases page."

@@ -1,0 +1,41 @@
+<svg width="100%" height="100%" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <title>macOS Timezone Icon - Centered</title>
+                <g id="Icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <!-- Background Squircle, defines the 1024x1024 canvas -->
+                    <path d="M381.56,22.22 C125.59,22.22 22.22,125.59 22.22,297.22 L22.22,726.78 C22.22,882.75 125.59,1001.78 281.56,1001.78 L742.44,1001.78 C898.41,1001.78 1001.78,882.75 1001.78,726.78 L1001.78,297.22 C1001.78,141.25 898.41,22.22 742.44,22.22 L381.56,22.22 Z" id="background-squircle" fill="#1F2937"></path>
+                    
+                    <!-- 
+                        This group contains all the foreground elements (arc and hands).
+                        The transform="translate(512, 512)" moves the group's origin (0,0)
+                        to the exact center of the 1024x1024 viewbox. This ensures
+                        mathematical centering for all child elements.
+                    -->
+                    <g id="centered-clock-elements" transform="translate(512, 512)">
+                        
+                        <!-- 
+                            The semi-circular ring. Centered at the group's origin (0,0).
+                        -->
+                        <circle
+                            cx="0"
+                            cy="0"
+                            r="280"
+                            fill="none"
+                            stroke="#FFFFFF"
+                            stroke-width="50"
+                            stroke-linecap="round"
+                            stroke-dasharray="1319.47 439.82"
+                            transform="rotate(125)"
+                        />
+
+                        <!-- 
+                            Clock Hands group. Also centered at the group's origin (0,0).
+                        -->
+                        <g id="clock-hands" stroke="#FFFFFF" stroke-width="60" stroke-linecap="round">
+                            <!-- Hour Hand starts from the origin (0,0) -->
+                            <path d="M0,0 L120,70" id="hour-hand"></path>
+                            <!-- Minute Hand also starts from the origin (0,0) -->
+                            <path d="M0,0 L-100,173" id="minute-hand"></path>
+                        </g>
+                    </g>
+                </g>
+            </svg>

@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 
 import '../assets/css/settings.css';
-import { Bug, Cog, Info, UserCog } from "lucide-react";
+import { Cog, Info, UserCog } from "lucide-react";
 import SettingGeneral from "../compontents/SettingGeneral.tsx";
 import SettingAbout from "../compontents/SettingAbout.tsx";
 import SettingProfile from "../compontents/SettingProfile.tsx";
@@ -15,23 +15,12 @@ type SettingsTab = "general" | "about" | "profile";
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("general")
-    const [launchAtStartup, setLaunchAtStartup] = useState(false)
 
     const tabs = [
         { id: "general" as const, label: "General", icon: <Cog className="w-5 h-5" /> },
         { id: "profile" as const, label: "Profile", icon: <UserCog className="w-5 h-5" /> },
         { id: "about" as const, label: "About", icon: <Info className="w-5 h-5" /> },
     ]
-
-    const handleCheckForUpdates = () => console.log("Checking for updates...");
-    const handleSendFeedback = () => console.log("Opening feedback...");
-    const handleQuit = () => console.log("Quitting application...");
-
-    const renderAboutSettings = () => (
-        <div className="text-center py-8">
-            x
-        </div>
-    )
 
     const renderContent = () => {
         switch (activeTab) {
@@ -47,7 +36,7 @@ export default function Settings() {
     }
 
     const appWindow = getCurrentWindow();
-    const handleDragStart = useCallback(async (e) => {
+    const handleDragStart = useCallback(async (e: any) => {
         if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
             return;
         }

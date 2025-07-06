@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/prepare-release.yml'
+      - '.github/workflows/release.yml'
+  pull_request:
+    branches: [master, develop]
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**.md'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          override: true
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check version consistency
+        run: .github/scripts/check-version.sh
+
+      # - name: Lint TypeScript
+      #   run: |
+      #     if [ -f "eslint.config.js" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
+      #       pnpm lint
+      #     else
+      #       echo "No ESLint config found, skipping TypeScript linting"
+      #     fi
+
+      - name: Type check
+        run: pnpm run build
+
+      # - name: Rust format check
+      #   run: |
+      #     cd src-tauri
+      #     cargo fmt --all -- --check
+
+      # - name: Rust clippy
+      #   run: |
+      #     cd src-tauri
+      #     cargo clippy --all-targets --all-features -- -D warnings
+
+      # - name: Rust tests
+      #   run: |
+      #     cd src-tauri
+      #     cargo test
+
+  build-check:
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      # - name: Install system dependencies (Ubuntu)
+      #   if: matrix.os == 'ubuntu-latest'
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y \
+      #       libwebkit2gtk-4.0-dev \
+      #       libappindicator3-dev \
+      #       librsvg2-dev \
+      #       patchelf
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build (without bundle)
+        run: |
+          cd src-tauri
+          cargo build
+
+      - name: Build frontend
+        run: pnpm run build
