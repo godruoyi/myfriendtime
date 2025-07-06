@@ -20,6 +20,8 @@
     "core:path:allow-resolve-directory",
     "core:path:allow-resolve",
     "core:path:allow-normalize",
-    "core:path:allow-join"
+    "core:path:allow-join",
+    "store:allow-load",
+    "store:default"
   ]
 }

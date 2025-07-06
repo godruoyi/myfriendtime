@@ -14,6 +14,9 @@ dependencies:
   '@tauri-apps/plugin-opener':
     specifier: ^2
     version: 2.0.0
+  '@tauri-apps/plugin-store':
+    specifier: ^2.3.0
+    version: 2.3.0
   '@types/lodash-es':
     specifier: ^4.17.12
     version: 4.17.12
@@ -939,6 +942,12 @@ packages:
     resolution: {integrity: sha512-J7xGF34HCI/ZdAh2hH72mYg5otwxWYY/5KJ+c2wE+Dr8qzCGF+PhdttNVam94RFTs5mwJ393t/mo8OSolFyWtw==}
     dependencies:
       '@tauri-apps/api': 2.0.0
+    dev: false
+
+  /@tauri-apps/plugin-store@2.3.0:
+    resolution: {integrity: sha512-mre8er0nXPhyEWQzWCpUd+UnEoBQYcoA5JYlwpwOV9wcxKqlXTGfminpKsE37ic8NUb2BIZqf0QQ9/U3ib2+/A==}
+    dependencies:
+      '@tauri-apps/api': 2.6.0
     dev: false
 
   /@types/babel__core@7.20.5:

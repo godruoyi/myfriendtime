@@ -38,6 +38,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::Focused(false) => {
                 let app_handle = window.app_handle().clone();

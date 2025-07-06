@@ -1,11 +1,15 @@
-import { Camera, Clock } from "lucide-react";
+import { Camera } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { open } from '@tauri-apps/plugin-dialog'
+import { invoke } from '@tauri-apps/api/core'
+import { load } from '@tauri-apps/plugin-store'
 
 export default function SettingProfile() {
     const [ownerName, setOwnerName] = useState("Me")
-    const [ownerAvatar, setOwnerAvatar] = useState("https://images.godruoyi.com/gblog/assets/brand_logo.Z0NyS6D-_2cLiuT.webp")
+    const [ownerAvatar, setOwnerAvatar] = useState<string | null>(null)
     const [currentTime, setCurrentTime] = useState("")
     const [timeZone, setTimeZone] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -27,27 +31,102 @@ export default function SettingProfile() {
         updateTime()
         const interval = setInterval(updateTime, 1000)
 
+        // Load user settings
+        loadUserSettings()
+
         return () => clearInterval(interval)
     }, [])
 
-    const handleAvatarClick = () => {
-        fileInputRef.current?.click()
-    }
+    const loadUserSettings = async () => {
+        setIsLoading(true)
+        try {
+            const store = await load('user-settings.json', { autoSave: true })
 
-    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setOwnerAvatar(e.target?.result as string)
-            }
-            reader.readAsDataURL(file)
+            const name = await store.get<string>('user_name')
+            const avatarPath = await store.get<string>('user_avatar_path')
+
+            setOwnerName(name || 'Me')
+            setOwnerAvatar(avatarPath || null)
+        } catch (error) {
+            console.error('Error loading user settings:', error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOwnerName(e.target.value)
+    const saveUserName = async (name: string) => {
+        try {
+            const store = await load('user-settings.json', { autoSave: true })
+            await store.set('user_name', name)
+            await store.save()
+        } catch (error) {
+            console.error('Error saving user name:', error)
+        }
     }
+
+    const saveUserAvatar = async (avatarPath: string | null) => {
+        try {
+            const store = await load('user-settings.json', { autoSave: true })
+            if (avatarPath) {
+                await store.set('user_avatar_path', avatarPath)
+            } else {
+                await store.delete('user_avatar_path')
+            }
+            await store.save()
+        } catch (error) {
+            console.error('Error saving user avatar:', error)
+        }
+    }
+
+    const handleAvatarClick = async () => {
+        try {
+            const selected = await open({
+                title: 'Select Your Avatar',
+                multiple: false,
+                filters: [
+                    {
+                        name: 'Images',
+                        extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'avif']
+                    }
+                ]
+            })
+
+            if (selected && typeof selected === 'string') {
+                // Use Tauri command to read file as base64
+                const base64Data = await invoke<string>('read_image_as_base64', {
+                    filePath: selected
+                })
+                setOwnerAvatar(base64Data)
+                // Auto-save avatar
+                await saveUserAvatar(base64Data)
+            }
+        } catch (error) {
+            console.error('Error selecting avatar:', error)
+        }
+    }
+
+    const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newName = e.target.value
+        setOwnerName(newName)
+        // Auto-save name with debounce
+        if (newName.trim()) {
+            await saveUserName(newName.trim())
+        }
+    }
+
+    const DefaultAvatar = () => (
+        <svg width="100%" height="100%" viewBox="0 0 80 80" fill="none" className="text-gray-400">
+            <circle cx="40" cy="40" r="40" fill="currentColor" fillOpacity="0.1" />
+            <path
+                d="M40 36C44.4183 36 48 32.4183 48 28C48 23.5817 44.4183 20 40 20C35.5817 20 32 23.5817 32 28C32 32.4183 35.5817 36 40 36Z"
+                fill="currentColor"
+            />
+            <path
+                d="M40 42C30.3349 42 22.5 49.8349 22.5 59.5C22.5 60.8807 23.6193 62 25 62H55C56.3807 62 57.5 60.8807 57.5 59.5C57.5 49.8349 49.6651 42 40 42Z"
+                fill="currentColor"
+            />
+        </svg>
+    )
 
     return (
         <div className="mx-auto px-10 py-8">
@@ -55,11 +134,19 @@ export default function SettingProfile() {
                 {/* Avatar Section - Left Side */}
                 <div className="flex flex-col items-center space-y-4 flex-shrink-0">
                     <div className="relative group rounded-full cursor-pointer" onClick={handleAvatarClick}>
-                        <img
-                            src={ownerAvatar}
-                            alt="Profile Avatar"
-                            className="object-cover rounded-full w-40 h-40 transition-all duration-300 relative z-10"
-                        />
+                        <div className="w-40 h-40 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
+                            {ownerAvatar ? (
+                                <img
+                                    src={ownerAvatar}
+                                    alt="Profile Avatar"
+                                    className="object-cover w-full h-full transition-all duration-300"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center p-4">
+                                    <DefaultAvatar />
+                                </div>
+                            )}
+                        </div>
                         <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-50 rounded-full transition-all duration-300 flex items-center justify-center z-20">
                             <Camera className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300" />
                         </div>
@@ -68,7 +155,7 @@ export default function SettingProfile() {
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
-                        onChange={handleAvatarChange}
+                        onChange={() => { }}
                         className="hidden"
                     />
                     <p className="text-sm text-gray-500 text-center max-w-32">
