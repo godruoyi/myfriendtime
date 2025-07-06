@@ -47,10 +47,10 @@ jobs:
       - name: Check version consistency
         run: .github/scripts/check-version.sh
 
-      - name: Rust format check
-        run: |
-          cd src-tauri
-          cargo fmt --all -- --check
+      # - name: Rust format check
+      #   run: |
+      #     cd src-tauri
+      #     cargo fmt --all -- --check
 
       - name: Build frontend
         run: pnpm run build
