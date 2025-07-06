@@ -49,59 +49,30 @@ jobs:
             exit 1
           fi
 
-      - name: Create release branch
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git checkout -b release/v${{ github.event.inputs.version }}
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
-      - name: Update package.json version
+      - name: Update all versions
         run: |
-          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          chmod +x .github/scripts/update-version.sh
+          .github/scripts/update-version.sh ${{ github.event.inputs.version }}
 
-      - name: Update Cargo.toml version
+      - name: Verify git status
         run: |
-          # Use a more reliable method to update only the package version
-          awk -v new_ver="${{ github.event.inputs.version }}" '
-          BEGIN { in_package = 0; updated = 0 }
-          /^\[package\]/ { in_package = 1 }
-          /^\[/ && !/^\[package\]/ { in_package = 0 }
-          in_package && /^version = / && !updated {
-              print "version = \"" new_ver "\""
-              updated = 1
-              next
-          }
-          { print }
-          ' src-tauri/Cargo.toml > src-tauri/Cargo.toml.tmp && mv src-tauri/Cargo.toml.tmp src-tauri/Cargo.toml
-
-      - name: Update tauri.conf.json version
-        run: |
-          sed -i 's/"version": "[^"]*"/"version": "${{ github.event.inputs.version }}"/' src-tauri/tauri.conf.json
-
-      - name: Update Cargo.lock
-        run: |
-          cd src-tauri
-          cargo update --package myfriendtime
-
-      - name: Verify changes
-        run: |
-          echo "=== package.json ==="
-          grep '"version"' package.json
-          echo "=== Cargo.toml ==="
-          grep 'version = ' src-tauri/Cargo.toml | head -1
-          echo "=== tauri.conf.json ==="
-          grep '"version"' src-tauri/tauri.conf.json
-
-      - name: Commit changes
-        run: |
-          git add .
-          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
-          git push origin release/v${{ github.event.inputs.version }}
+          echo "=== Git Status ==="
+          git status
+          echo "=== Git Diff ==="
+          git diff
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ github.event.inputs.version }}"
           branch: release/v${{ github.event.inputs.version }}
           base: master
           title: "Release v${{ github.event.inputs.version }}"
@@ -127,3 +98,15 @@ jobs:
             automated
           reviewers: |
             ${{ github.actor }}
+
+      - name: Check PR creation result
+        run: |
+          echo "PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+          if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
+            echo "✅ Pull Request created successfully!"
+            echo "🔗 ${{ steps.create-pr.outputs.pull-request-url }}"
+          else
+            echo "❌ Failed to create Pull Request"
+            exit 1
+          fi

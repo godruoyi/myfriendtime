@@ -36,7 +36,14 @@ in_package && /^version = / && !updated {
 
 # Update tauri.conf.json
 echo "⚙️  Updating tauri.conf.json..."
-sed -i.bak 's/"version": "[^"]*"/"version": "'"$NEW_VERSION"'"/' src-tauri/tauri.conf.json && rm -f src-tauri/tauri.conf.json.bak
+# Use cross-platform sed command
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i.bak 's/"version": "[^"]*"/"version": "'"$NEW_VERSION"'"/' src-tauri/tauri.conf.json && rm -f src-tauri/tauri.conf.json.bak
+else
+    # Linux (Ubuntu)
+    sed -i 's/"version": "[^"]*"/"version": "'"$NEW_VERSION"'"/' src-tauri/tauri.conf.json
+fi
 
 # Update Cargo.lock
 echo "🔒 Updating Cargo.lock..."
