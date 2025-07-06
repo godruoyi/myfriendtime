@@ -93,11 +93,6 @@ jobs:
             - The release workflow will automatically build and publish the app
 
             **⚠️ Merging this PR will trigger an automatic release!**
-          labels: |
-            release
-            automated
-          reviewers: |
-            ${{ github.actor }}
 
       - name: Check PR creation result
         run: |

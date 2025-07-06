@@ -11,7 +11,7 @@ on:
 
 jobs:
   check-release:
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
       should-release: ${{ steps.check.outputs.should-release }}
@@ -25,8 +25,10 @@ jobs:
         run: |
           if [[ "${{ github.event.pull_request.title }}" =~ ^Release\ v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "should-release=true" >> $GITHUB_OUTPUT
+            echo "✅ This is a release PR based on title: ${{ github.event.pull_request.title }}"
           else
             echo "should-release=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  This is not a release PR (title: ${{ github.event.pull_request.title }})"
           fi
 
       - name: Extract version
