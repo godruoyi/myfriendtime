@@ -1,9 +1,11 @@
-import type React from "react"
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Camera, ChevronDown } from "lucide-react"
+import { open } from '@tauri-apps/plugin-dialog'
+import { invoke } from '@tauri-apps/api/core'
+import { getCurrentWindow } from "@tauri-apps/api/window"
+import type { Friend } from '../types'
 
 import '../assets/css/new_friend.css';
-import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const timezones = [
     { label: "New York (EST)", value: "America/New_York", city: "New York", country: "United States" },
@@ -38,7 +40,6 @@ export default function NewFriend() {
     const [selectedTimezone, setSelectedTimezone] = useState("")
     const [currentTime, setCurrentTime] = useState(new Date())
     const [isHoveringAvatar, setIsHoveringAvatar] = useState(false)
-    const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         const updateTime = () => {
@@ -49,6 +50,15 @@ export default function NewFriend() {
         const interval = setInterval(updateTime, 1000)
 
         return () => clearInterval(interval)
+    }, [])
+
+    // Clear form when component mounts (when window opens)
+    useEffect(() => {
+        // Reset form state when window opens
+        setFriendName("")
+        setFriendAvatar(null)
+        setSelectedTimezone("")
+        setIsHoveringAvatar(false)
     }, [])
 
     const formatTime = (date: Date, timeZone?: string) => {
@@ -64,18 +74,28 @@ export default function NewFriend() {
         return date.toLocaleTimeString('en-US', options)
     }
 
-    const handleAvatarClick = () => {
-        fileInputRef.current?.click()
-    }
+    const handleAvatarClick = async () => {
+        try {
+            const selected = await open({
+                title: 'Select Friend Avatar',
+                multiple: false,
+                filters: [
+                    {
+                        name: 'Images',
+                        extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'avif']
+                    }
+                ]
+            })
 
-    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setFriendAvatar(e.target?.result as string)
+            if (selected && typeof selected === 'string') {
+                // Use Tauri command to read file as base64
+                const base64Data = await invoke<string>('read_image_as_base64', {
+                    filePath: selected
+                })
+                setFriendAvatar(base64Data)
             }
-            reader.readAsDataURL(file)
+        } catch (error) {
+            console.error('Error selecting avatar:', error)
         }
     }
 
@@ -87,16 +107,33 @@ export default function NewFriend() {
         const timezone = timezones.find((tz) => tz.value === selectedTimezone)
         if (!timezone) return
 
-        console.log({
-            name: friendName.trim(),
-            avatar: friendAvatar,
-            timezone: timezone.value,
-            city: timezone.city,
-            country: timezone.country,
-        })
+        try {
+            // Call Tauri command to save friend
+            const savedFriend = await invoke<Friend>('add_friend_command', {
+                request: {
+                    name: friendName.trim(),
+                    avatar: friendAvatar || '', // Use empty string if no avatar
+                    timezone: timezone.value,
+                    city: timezone.city,
+                    country: timezone.country,
+                }
+            })
 
-        const appWindow = getCurrentWindow()
-        await appWindow.close()
+            console.log('Friend saved successfully:', savedFriend)
+
+            // Clear form state for next use
+            setFriendName("")
+            setFriendAvatar(null)
+            setSelectedTimezone("")
+            setIsHoveringAvatar(false)
+
+            // Hide window after successful save (use hide instead of close)
+            const appWindow = getCurrentWindow()
+            await appWindow.close()
+        } catch (error) {
+            console.error('Error saving friend:', error)
+            // TODO: Show error message to user
+        }
     }
 
     const canSave = friendName.trim() && selectedTimezone
@@ -124,11 +161,11 @@ export default function NewFriend() {
                                 preserveAspectRatio="none"
                             >
                                 <path
-                                    d="M 25 27 Q 49 70 74 27"
-                                    stroke="#d1d5db"
-                                    strokeWidth="2"
+                                    d="M 25 27 Q 51 70 75 25"
+                                    className="stroke-current text-gray-800 opacity-80"
+                                    strokeWidth="1.5"
                                     fill="none"
-                                    strokeDasharray="4 4"
+                                    strokeDasharray="3 2"
                                 />
                             </svg>
 
@@ -161,21 +198,13 @@ export default function NewFriend() {
                                             )}
                                         </div>
                                         <div
-                                            className={`absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center transition-all duration-300 ${isHoveringAvatar ? 'opacity-100' : 'opacity-0'
-                                                }`}
+                                            className={`absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center transition-all duration-300 ${isHoveringAvatar ? 'opacity-100' : 'opacity-0'}`}
                                         >
                                             <div className="bg-white bg-opacity-90 rounded-full p-3 shadow-md">
                                                 <Camera size={24} className="text-gray-700" />
                                             </div>
                                         </div>
                                     </div>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleAvatarChange}
-                                        accept="image/*"
-                                        className="hidden"
-                                    />
                                 </div>
 
                                 <div className="flex flex-col items-end text-right">

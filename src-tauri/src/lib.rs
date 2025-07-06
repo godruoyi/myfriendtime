@@ -37,6 +37,7 @@ pub fn run() {
         .on_menu_event(on_menu_event)
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_dialog::init())
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::Focused(false) => {
                 let app_handle = window.app_handle().clone();
@@ -62,8 +63,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::greet_command::greet_command,
             commands::get_friends_command::get_friends_command,
+            commands::add_friend_command::add_friend_command,
             commands::open_settings_window_command::open_settings_window_command,
             commands::open_new_friend_command::open_new_friend_window_command,
+            commands::read_image_command::read_image_as_base64,
             commands::resize_window_command::resize_settings_window,
             commands::resize_window_command::get_window_size,
         ])

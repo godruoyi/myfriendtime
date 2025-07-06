@@ -11,6 +11,15 @@
     "core:default",
     "opener:default",
     "core:window:allow-set-size",
-    "core:window:allow-start-dragging"
+    "core:window:allow-start-dragging",
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:event:allow-listen",
+    "dialog:allow-open",
+    "core:path:default",
+    "core:path:allow-resolve-directory",
+    "core:path:allow-resolve",
+    "core:path:allow-normalize",
+    "core:path:allow-join"
   ]
 }
