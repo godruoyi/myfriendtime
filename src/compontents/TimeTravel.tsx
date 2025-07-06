@@ -1,12 +1,12 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import * as times from "../support/times.ts";
-import {RotateCcw} from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 interface TimeTravelProps {
     onTimeOffsetChange: (offsetMinutes: number) => void;
 }
 
-export default function TimeTravel({onTimeOffsetChange}: TimeTravelProps) {
+export default function TimeTravel({ onTimeOffsetChange }: TimeTravelProps) {
     const [timeOffset, setTimeOffset] = useState(0)
 
     const handleTimeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +29,7 @@ export default function TimeTravel({onTimeOffsetChange}: TimeTravelProps) {
                                     onClick={() => setTimeOffset(0)}
                                     className="rounded transition-colors flex items-center justify-center"
                                 >
-                                    <RotateCcw className="h-4 w-4"/>
+                                    <RotateCcw className="h-4 w-4" />
                                 </button>
                             )}
                         </div>
@@ -42,7 +42,13 @@ export default function TimeTravel({onTimeOffsetChange}: TimeTravelProps) {
                         value={timeOffset}
                         onChange={handleTimeSliderChange}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                            background: '#E5E7EB',
+                            WebkitAppearance: 'none',
+                            appearance: 'none'
+                        }}
                     />
+
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
                         <span>-12h</span>
                         <span>Now</span>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { load } from '@tauri-apps/plugin-store'
+import { invoke } from '@tauri-apps/api/core'
 
 const SettingsRow = ({ label, description, children }: {
     label: string,
@@ -33,37 +34,69 @@ export default function SettingGeneral() {
     const loadUserSettings = async () => {
         setIsLoading(true)
         try {
+            // Load from store first
             const store = await load('user-settings.json', { autoSave: true })
             const startupSetting = await store.get<boolean>('launch_at_startup')
-            setLaunchAtStartup(startupSetting || false)
+
+            // Then check the actual system autostart status
+            try {
+                const systemStartupEnabled = await invoke<boolean>('is_autostart_enabled')
+
+                // Use system status as the source of truth
+                const actualStatus = systemStartupEnabled
+                setLaunchAtStartup(actualStatus)
+
+                // Update store if they don't match
+                if (startupSetting !== actualStatus) {
+                    await store.set('launch_at_startup', actualStatus)
+                    await store.save()
+                }
+            } catch (systemError) {
+                console.error('Failed to check system autostart status:', systemError)
+                // Fallback to store value if system check fails
+                setLaunchAtStartup(startupSetting || false)
+            }
         } catch (error) {
             console.error('Error loading user settings:', error)
+            setLaunchAtStartup(false)
         } finally {
             setIsLoading(false)
         }
     }
 
     const handleLaunchAtStartupChange = async (checked: boolean) => {
+        const originalValue = launchAtStartup
         setLaunchAtStartup(checked)
 
         try {
+            // First update the system autostart setting
+            if (checked) {
+                await invoke('enable_autostart')
+            } else {
+                await invoke('disable_autostart')
+            }
+
+            // Then update the store
             const store = await load('user-settings.json', { autoSave: true })
             await store.set('launch_at_startup', checked)
             await store.save()
 
             console.log('Launch at startup setting updated successfully')
-
-            // TODO: 这里可以添加实际的开机启动系统级操作
-            // 比如调用 tauri-plugin-autostart 或者系统 API
         } catch (error) {
             console.error('Error updating launch at startup:', error)
-            // Revert the checkbox if save failed
-            setLaunchAtStartup(!checked)
+            // Revert the checkbox if operation failed
+            setLaunchAtStartup(originalValue)
+
+            // Show user-friendly error message
+            alert(`Failed to ${checked ? 'enable' : 'disable'} launch at startup. This feature may not be available in development mode.`)
         }
     }
     return (
         <div className="flex-1">
-            <SettingsRow label="Startup">
+            <SettingsRow
+                label="Startup"
+                description="Note: Launch at startup may not work in development mode. This feature works properly when the app is built and installed."
+            >
                 <input
                     type="checkbox"
                     checked={launchAtStartup}

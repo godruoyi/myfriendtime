@@ -1,4 +1,6 @@
 pub mod add_friend_command;
+pub mod autostart_command;
+pub mod delete_friend_command;
 pub mod get_friends_command;
 pub mod greet_command;
 pub mod open_new_friend_command;

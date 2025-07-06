@@ -39,6 +39,7 @@ pub fn run() {
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::Focused(false) => {
                 let app_handle = window.app_handle().clone();
@@ -50,7 +51,7 @@ pub fn run() {
 
                     if !is_any_app_window_focused {
                         if let Some(main_window) = app_handle.get_window("main") {
-                            main_window.hide().unwrap();
+                            // main_window.hide().unwrap();
                         }
                     }
                 });
@@ -65,11 +66,15 @@ pub fn run() {
             commands::greet_command::greet_command,
             commands::get_friends_command::get_friends_command,
             commands::add_friend_command::add_friend_command,
+            commands::delete_friend_command::delete_friend_command,
             commands::open_settings_window_command::open_settings_window_command,
             commands::open_new_friend_command::open_new_friend_window_command,
             commands::read_image_command::read_image_as_base64,
             commands::resize_window_command::resize_settings_window,
             commands::resize_window_command::get_window_size,
+            commands::autostart_command::enable_autostart,
+            commands::autostart_command::disable_autostart,
+            commands::autostart_command::is_autostart_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

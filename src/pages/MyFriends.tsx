@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { load } from '@tauri-apps/plugin-store'
-import { Plus, Settings } from "lucide-react";
+import { Clock, Cog, Plus, Settings } from "lucide-react";
 import TimeTravel from "../compontents/TimeTravel.tsx";
 import FriendItem from "../compontents/FriendItem.tsx";
 import MyTime from "../compontents/MyTime.tsx";
@@ -137,24 +137,31 @@ export default function MyFriends() {
         }
     }
 
+    const handleDeleteFriend = (friendId: string) => {
+        // Remove the friend from the local state
+        setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
+    }
+
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-            <div className="pl-4 pr-3 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h1 className="text-lg font-bold">
-                    <span className="text-gray-900">MyFriend</span>
-                    <span className="font-mono ml-0.5 text-[#E57C00]">Time</span>
-                </h1>
+            <div className="bg-gray-50 pl-4 pr-3 py-4 flex items-center justify-between">
+                <div className="flex items-center">
+                    <h1 className="text-lg font-bold">
+                        <span className="text-gray-900">MyFriend</span>
+                        <span className="font-mono ml-0.5 text-[#E57C00]">Time</span>
+                    </h1>
+                </div>
                 <div className="flex items-center">
                     <button
                         onClick={newFriend}
-                        className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-end"
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                     >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="h-5 w-5 text-gray-600" />
                     </button>
                     <button
                         onClick={openSettings}
-                        className="p-1 hover:bg-gray-100 rounded-md transition-colors flex items-center justify-end">
-                        <Settings className="w-4 h-4" />
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors">
+                        <Cog className="h-5 w-5 text-gray-600" />
                     </button>
                 </div>
             </div>
@@ -166,10 +173,9 @@ export default function MyFriends() {
                 userName={userName}
             />
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-96 bg-white overflow-y-auto space-y-0 scrollbar-hide">
                 {friends.length === 0 ? (
                     <div className="px-4 py-8 text-center text-gray-500">
-                        <div className="text-2xl mb-2">🌍</div>
                         <p className="text-sm">No friends added yet</p>
                         <p className="text-xs text-gray-400 mt-1">Click + to add your first friend</p>
                     </div>

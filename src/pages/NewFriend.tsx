@@ -22,7 +22,6 @@ const timezones = [
 
 const DefaultAvatar = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="text-gray-400">
-        <circle cx="40" cy="40" r="40" fill="currentColor" fillOpacity="0.1" />
         <path
             d="M40 36C44.4183 36 48 32.4183 48 28C48 23.5817 44.4183 20 40 20C35.5817 20 32 23.5817 32 28C32 32.4183 35.5817 36 40 36Z"
             fill="currentColor"
@@ -161,11 +160,11 @@ export default function NewFriend() {
                                 preserveAspectRatio="none"
                             >
                                 <path
-                                    d="M 25 27 Q 51 70 75 25"
+                                    d="M 12 28 L 12 46 L 86 46 L 86 28"
                                     className="stroke-current text-gray-800 opacity-80"
-                                    strokeWidth="1.5"
+                                    strokeWidth="0.6"
                                     fill="none"
-                                    strokeDasharray="3 2"
+                                    strokeDasharray="2 1.6"
                                 />
                             </svg>
 
@@ -192,13 +191,13 @@ export default function NewFriend() {
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center p-2">
+                                                <div className="w-full h-full flex items-center justify-center">
                                                     <DefaultAvatar />
                                                 </div>
                                             )}
                                         </div>
                                         <div
-                                            className={`absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center transition-all duration-300 ${isHoveringAvatar ? 'opacity-100' : 'opacity-0'}`}
+                                            className={`absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center transition-all duration-300 ${isHoveringAvatar ? 'opacity-80' : 'opacity-0'}`}
                                         >
                                             <div className="bg-white bg-opacity-90 rounded-full p-3 shadow-md">
                                                 <Camera size={24} className="text-gray-700" />
