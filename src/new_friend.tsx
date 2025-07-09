@@ -1,6 +1,6 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import AnimatedSizeWrapper from "./compontents/AnimatedSizeWrapper.tsx";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import AnimatedSizeWrapper from './compontents/AnimatedSizeWrapper.tsx';
 import NewFriend from './pages/NewFriend.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -8,5 +8,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AnimatedSizeWrapper>
             <NewFriend />
         </AnimatedSizeWrapper>
-    </React.StrictMode>,
-)
+    </React.StrictMode>
+);

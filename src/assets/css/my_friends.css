@@ -1,6 +1,7 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-body, html {
+body,
+html {
     background-color: transparent;
     user-select: none;
     cursor: default;
@@ -49,18 +50,18 @@ body, html {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #E57C00;
+    background: #e57c00;
     cursor: pointer;
     border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #E57C00;
+    background: #e57c00;
     cursor: pointer;
     border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }

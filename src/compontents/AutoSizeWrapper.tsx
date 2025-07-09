@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { getCurrentWindow, PhysicalSize } from '@tauri-apps/api/window';
-import { debounce } from "lodash-es";
+import { debounce } from 'lodash-es';
 
 interface AutoSizeWrapperProps {
     children: React.ReactNode;
@@ -22,15 +22,11 @@ const AutoSizeWrapper: React.FC<AutoSizeWrapperProps> = ({ children, debounceMs 
                 const currentPhysicalSize = await appWindow.outerSize();
 
                 if (Math.abs(currentPhysicalSize.height - finalPhysicalHeight) > scaleFactor) {
-                    console.log(
-                        `Resizing: logicalH=${logicalHeight}, scale=${scaleFactor}, physicalH=${finalPhysicalHeight}`
-                    );
-                    await appWindow.setSize(
-                        new PhysicalSize(currentPhysicalSize.width, finalPhysicalHeight + 0)
-                    );
+                    console.log(`Resizing: logicalH=${logicalHeight}, scale=${scaleFactor}, physicalH=${finalPhysicalHeight}`);
+                    await appWindow.setSize(new PhysicalSize(currentPhysicalSize.width, finalPhysicalHeight + 0));
                 }
             } catch (error) {
-                console.error("Failed to resize window:", error);
+                console.error('Failed to resize window:', error);
             }
         }, debounceMs),
         [debounceMs]
@@ -55,11 +51,7 @@ const AutoSizeWrapper: React.FC<AutoSizeWrapperProps> = ({ children, debounceMs 
         };
     }, [handleResize]);
 
-    return (
-        <div ref={wrapperRef}>
-            {children}
-        </div>
-    );
+    return <div ref={wrapperRef}>{children}</div>;
 };
 
 export default AutoSizeWrapper;

@@ -48,18 +48,6 @@ pub fn insert_friend(data_dir: &Path, friend: Friend) -> Result<(), String> {
     write_friends_data(data_dir, &friends)
 }
 
-pub fn update_friend(data_dir: &Path, updated_friend: Friend) -> Result<(), String> {
-    let mut friends = get_friends(data_dir)?;
-
-    // Skip if friend doesn't exist
-    if let Some(index) = friends.iter().position(|f| f.id == updated_friend.id) {
-        friends[index] = updated_friend;
-        write_friends_data(data_dir, &friends)?;
-    }
-
-    Ok(())
-}
-
 pub fn delete_friend(data_dir: &Path, friend_id: &str) -> Result<(), String> {
     let mut friends = get_friends(data_dir)?;
 

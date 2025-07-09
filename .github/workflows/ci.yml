@@ -1,62 +1,58 @@
 name: CI
 
 on:
-  push:
-    branches: [master, develop]
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/prepare-release.yml'
-      - '.github/workflows/release.yml'
-  pull_request:
-    branches: [master, develop]
-    types: [opened, synchronize, reopened]
-    paths-ignore:
-      - '**.md'
+    push:
+        branches: [master, develop]
+        paths-ignore:
+            - '**.md'
+            - '.github/workflows/prepare-release.yml'
+            - '.github/workflows/release.yml'
+    pull_request:
+        branches: [master, develop]
+        types: [opened, synchronize, reopened]
+        paths-ignore:
+            - '**.md'
 
 env:
-  CARGO_TERM_COLOR: always
+    CARGO_TERM_COLOR: always
 
 jobs:
-  test-and-build:
-    runs-on: macos-latest
+    test-and-build:
+        runs-on: macos-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
 
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: rustfmt
-          override: true
+            - name: Setup Rust
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: stable
+                  components: rustfmt, clippy
+                  override: true
 
-      - name: Install dependencies
-        run: pnpm install
+            - name: Format
+              run: cargo fmt --all -- --check
 
-      - name: Check version consistency
-        run: .github/scripts/check-version.sh
+            - name: Clippy
+              run: cargo clippy --workspace --all-features --all-targets -- -D warnings
 
-      # - name: Rust format check
-      #   run: |
-      #     cd src-tauri
-      #     cargo fmt --all -- --check
+            - name: Install dependencies
+              run: pnpm install
 
-      - name: Build frontend
-        run: pnpm run build
+            - name: Run Prettier
+              run: pnpm run lint:fix
 
-      # - name: Build Rust (check compilation)
-      #   run: |
-      #     cd src-tauri
-      #     cargo build
-      # todo cargo and clippy check
+            - uses: autofix-ci/action@v1
+              with:
+                commit-message: "chore: autofix code style"

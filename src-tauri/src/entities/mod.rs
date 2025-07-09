@@ -1,2 +1,3 @@
-pub mod friend;
-pub use friend::Friend;
+mod friend;
+
+pub use friend::{AddFriendRequest, Friend};

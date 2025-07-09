@@ -2,7 +2,6 @@ mod commands;
 mod entities;
 mod support;
 
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::Manager;
 use tauri_plugin_positioner::{Position, WindowExt};
@@ -16,71 +15,60 @@ pub fn run() {
 
             Ok(())
         })
-        .menu(|handle| {
-            Menu::with_items(
-                handle,
-                &[&Submenu::with_items(
-                    handle,
-                    "File",
-                    true,
-                    &[
-                        &PredefinedMenuItem::close_window(handle, None)?,
-                        &PredefinedMenuItem::quit(handle, None)?,
-                        &PredefinedMenuItem::separator(handle)?,
-                        #[cfg(target_os = "macos")]
-                        &MenuItem::new(handle, "Hello", true, None::<&str>)?,
-                    ],
-                )?],
-            )
-        })
         .on_tray_icon_event(on_tray_icon_event)
         .on_menu_event(on_menu_event)
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
-        .on_window_event(|window, event| match event {
-            tauri::WindowEvent::Focused(false) => {
-                let app_handle = window.app_handle().clone();
-                tauri::async_runtime::spawn(async move {
-                    let is_any_app_window_focused = app_handle
-                        .windows()
-                        .values()
-                        .any(|w| w.is_focused().unwrap_or(false));
-
-                    if !is_any_app_window_focused {
-                        if let Some(main_window) = app_handle.get_window("main") {
-                            // main_window.hide().unwrap();
-                        }
-                    }
-                });
-            }
-            tauri::WindowEvent::CloseRequested { api, .. } => {
-                    api.prevent_close();
-                    window.hide().unwrap();
-            }
-            _ => {}
-        })
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
+        .on_window_event(on_window_event)
         .invoke_handler(tauri::generate_handler![
-            commands::greet_command::greet_command,
-            commands::get_friends_command::get_friends_command,
-            commands::add_friend_command::add_friend_command,
-            commands::delete_friend_command::delete_friend_command,
-            commands::open_settings_window_command::open_settings_window_command,
-            commands::open_new_friend_command::open_new_friend_window_command,
-            commands::read_image_command::read_image_as_base64,
-            commands::resize_window_command::resize_settings_window,
-            commands::resize_window_command::get_window_size,
-            commands::autostart_command::enable_autostart,
-            commands::autostart_command::disable_autostart,
-            commands::autostart_command::is_autostart_enabled,
+            commands::friends::get_friends_command,
+            commands::friends::add_friend_command,
+            commands::friends::delete_friend_command,
+            commands::windows::open_settings_window_command,
+            commands::windows::open_new_friend_window_command,
+            commands::systems::read_image_as_base64_command,
+            commands::systems::enable_autostart_command,
+            commands::systems::disable_autostart_command,
+            commands::systems::is_autostart_enabled_command,
+            commands::systems::exit_app_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-fn on_menu_event(app: &tauri::AppHandle, event: tauri::menu::MenuEvent) {
+fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
+    match event {
+        tauri::WindowEvent::Focused(false) => {
+            let app_handle = window.app_handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let is_any_app_window_focused = app_handle
+                    .windows()
+                    .values()
+                    .any(|w| w.is_focused().unwrap_or(false));
+
+                if !is_any_app_window_focused {
+                    if let Some(main_window) = app_handle.get_window("main") {
+                        main_window.hide().unwrap();
+                    }
+                }
+            });
+        }
+        tauri::WindowEvent::CloseRequested { api, .. } => {
+            api.prevent_close();
+            window.hide().unwrap();
+        }
+        _ => {}
+    }
+}
+
+fn on_menu_event(_app: &tauri::AppHandle, event: tauri::menu::MenuEvent) {
     println!("Menu event: {:?}", event);
 
     match event.id.as_ref() {
@@ -96,7 +84,6 @@ fn on_tray_icon_event(app: &tauri::AppHandle, event: tauri::tray::TrayIconEvent)
 
     if let TrayIconEvent::Click {
         id,
-        rect,
         button,
         button_state,
         ..

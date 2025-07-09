@@ -7,3 +7,12 @@ pub struct Friend {
     pub city: String,
     pub country: String,
 }
+
+#[derive(serde::Deserialize)]
+pub struct AddFriendRequest {
+    pub name: String,
+    pub avatar: String,
+    pub timezone: String,
+    pub city: String,
+    pub country: String,
+}

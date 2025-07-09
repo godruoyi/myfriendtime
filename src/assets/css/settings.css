@@ -1,13 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #FCFCFC;
+    background-color: #fcfcfc;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
 }
-

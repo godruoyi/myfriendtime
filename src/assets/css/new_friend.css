@@ -1,10 +1,11 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

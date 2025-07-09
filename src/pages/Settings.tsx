@@ -1,83 +1,63 @@
-"use client"
+'use client';
 
-import { useCallback, useState } from "react"
-
+import { useEffect, useState } from 'react';
+import SettingGeneral from '../compontents/ui/SettingGeneral.tsx';
+import SettingAbout from '../compontents/ui/SettingAbout.tsx';
+import SettingProfile from '../compontents/ui/SettingProfile.tsx';
+import SettingHeader from '../compontents/ui/SettingHeader.tsx';
+import { LazyStore } from '@tauri-apps/plugin-store';
+import type { Settings } from '../api.ts';
 import '../assets/css/settings.css';
-import { Cog, Info, UserCog } from "lucide-react";
-import SettingGeneral from "../compontents/SettingGeneral.tsx";
-import SettingAbout from "../compontents/SettingAbout.tsx";
-import SettingProfile from "../compontents/SettingProfile.tsx";
-import { getCurrentWindow } from '@tauri-apps/api/window';
 
-
-type SettingsTab = "general" | "about" | "profile";
-
+type SettingsTab = 'general' | 'about' | 'profile';
 
 export default function Settings() {
-    const [activeTab, setActiveTab] = useState<SettingsTab>("general")
+    const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+    const store = new LazyStore('user-settings.json', { autoSave: true });
+    const [username, setUsername] = useState<string>('');
+    const [userAvatarPath, setUserAvatarPath] = useState<string>('');
+    const [startup, setStartup] = useState<boolean>(false);
 
-    const tabs = [
-        { id: "general" as const, label: "General", icon: <Cog className="w-5 h-5" /> },
-        { id: "profile" as const, label: "Profile", icon: <UserCog className="w-5 h-5" /> },
-        { id: "about" as const, label: "About", icon: <Info className="w-5 h-5" /> },
-    ]
+    useEffect(() => {
+        async function initializeSettings() {
+            try {
+                const name = await store.get<string>('user_name');
+                const avatarPath = await store.get<string>('user_avatar_path');
+                const startup = await store.get<boolean>('launch_at_startup');
 
-    const renderContent = () => {
-        switch (activeTab) {
-            case "general":
-                return <SettingGeneral />
-            case "about":
-                return <SettingAbout />
-            case "profile":
-                return <SettingProfile />
-            default:
-                return null
-        }
-    }
-
-    const appWindow = getCurrentWindow();
-    const handleDragStart = useCallback(async (e: any) => {
-        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-            return;
+                setUsername(name || 'MyFriendTime');
+                setUserAvatarPath(avatarPath || '');
+                setStartup(startup !== undefined ? startup : false);
+            } catch (error) {
+                console.error('Error initializing settings:', error);
+            }
         }
 
-        try {
-            await appWindow.startDragging();
-        } catch (error) {
-            console.error("Failed to start dragging:", error);
-        }
+        initializeSettings();
     }, []);
 
+    const handleSettingsChange = async (key: string, value: any) => {
+        store.set(key, value);
+        if (key === 'user_name') {
+            setUsername(value);
+        } else if (key === 'user_avatar_path') {
+            setUserAvatarPath(value);
+        } else if (key === 'launch_at_startup') {
+            setStartup(value);
+        }
+    };
 
     return (
-        <div className="">
-            <div onMouseDown={handleDragStart}>
-                <div className="pt-8 flex-shrink-0 bg-red pb-2 border-b border-gray-200">
-                    <nav className="flex justify-center">
-                        <div className="flex space-x-0.5 rounded-lg backdrop-blur-sm">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex flex-col py-1 px-2 items-center text-[10px] font-medium rounded-md transition-all duration-200 ${activeTab === tab.id
-                                        ? 'bg-[#EFEFEF] text-[#0066EB] shadow-sm'
-                                        : 'text-gray-500 hover:bg-[#EFEFEF] transition-colors'
-                                        }`}
-                                >
-                                    {tab.icon}
-                                    <span>{tab.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </nav>
-                </div>
-            </div>
+        <div>
+            <SettingHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className="flex-1 overflow-y-auto">
-                <div className="p-6">
-                    {renderContent()}
+                <div className="px-6 pb-6 pt-4">
+                    {activeTab === 'general' && <SettingGeneral startup={startup} onChange={handleSettingsChange} />}
+                    {activeTab === 'about' && <SettingAbout />}
+                    {activeTab === 'profile' && <SettingProfile username={username} avatar={userAvatarPath} onChange={handleSettingsChange} />}
                 </div>
             </div>
         </div>
-    )
+    );
 }
