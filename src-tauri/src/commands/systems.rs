@@ -14,8 +14,8 @@ pub async fn enable_autostart_command(app_handle: AppHandle) -> Result<(), Strin
     match autostart_manager.enable() {
         Ok(_) => Ok(()),
         Err(e) => {
-            eprintln!("Failed to enable autostart: {}", e);
-            Err(format!("Failed to enable autostart: {}", e))
+            eprintln!("Failed to enable autostart: {e}");
+            Err(format!("Failed to enable autostart: {e}"))
         }
     }
 }
@@ -27,8 +27,8 @@ pub async fn disable_autostart_command(app_handle: AppHandle) -> Result<(), Stri
     match autostart_manager.disable() {
         Ok(_) => Ok(()),
         Err(e) => {
-            eprintln!("Failed to disable autolaunch: {}", e);
-            Err(format!("Failed to disable autolaunch: {}", e))
+            eprintln!("Failed to disable autolaunch: {e}");
+            Err(format!("Failed to disable autolaunch: {e}"))
         }
     }
 }
@@ -40,8 +40,8 @@ pub async fn is_autostart_enabled_command(app_handle: AppHandle) -> Result<bool,
     match autostart_manager.is_enabled() {
         Ok(enabled) => Ok(enabled),
         Err(e) => {
-            eprintln!("Failed to check autostart status: {}", e);
-            Err(format!("Failed to check autostart status: {}", e))
+            eprintln!("Failed to check autostart status: {e}");
+            Err(format!("Failed to check autostart status: {e}"))
         }
     }
 }
@@ -73,10 +73,10 @@ pub fn read_image_as_base64_command(file_path: String) -> Result<String, String>
             };
 
             let base64_string = general_purpose::STANDARD.encode(&bytes);
-            let data_url = format!("data:{};base64,{}", mime_type, base64_string);
+            let data_url = format!("data:{mime_type};base64,{base64_string}");
 
             Ok(data_url)
         }
-        Err(err) => Err(format!("Failed to read file: {}", err)),
+        Err(err) => Err(format!("Failed to read file: {err}")),
     }
 }

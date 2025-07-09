@@ -69,14 +69,7 @@ fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
 }
 
 fn on_menu_event(_app: &tauri::AppHandle, event: tauri::menu::MenuEvent) {
-    println!("Menu event: {:?}", event);
-
-    match event.id.as_ref() {
-        "Hello" => {
-            println!("Hello menu item clicked");
-        }
-        _ => {}
-    }
+    println!("Menu event: {event:?}");
 }
 
 fn on_tray_icon_event(app: &tauri::AppHandle, event: tauri::tray::TrayIconEvent) {

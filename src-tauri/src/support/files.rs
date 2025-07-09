@@ -15,8 +15,8 @@ pub fn get_friends(data_dir: &Path) -> Result<Vec<Friend>, String> {
         return Ok(vec![]);
     }
 
-    let friends_data = fs::read_to_string(&friends_file)
-        .map_err(|e| format!("Cannot read friends file: {}", e))?;
+    let friends_data =
+        fs::read_to_string(&friends_file).map_err(|e| format!("Cannot read friends file: {e}"))?;
 
     if friends_data.trim().is_empty() {
         println!("Friends file is empty, returning empty list.");
@@ -24,7 +24,7 @@ pub fn get_friends(data_dir: &Path) -> Result<Vec<Friend>, String> {
     }
 
     let friends: Vec<Friend> = serde_json::from_str(&friends_data)
-        .map_err(|e| format!("Cannot parse friends data: {}", e))?;
+        .map_err(|e| format!("Cannot parse friends data: {e}"))?;
 
     if friends.is_empty() {
         println!("No friends found in the file, returning empty list.");
@@ -67,10 +67,10 @@ pub fn write_friends_data(data_dir: &Path, friends: &[Friend]) -> Result<(), Str
 
     let friends_file = get_friends_file_path(data_dir);
     let friends_data = serde_json::to_string_pretty(friends)
-        .map_err(|e| format!("Cannot serialize friends data: {}", e))?;
+        .map_err(|e| format!("Cannot serialize friends data: {e}"))?;
 
     fs::write(&friends_file, friends_data)
-        .map_err(|e| format!("Cannot write friends file: {}", e))?;
+        .map_err(|e| format!("Cannot write friends file: {e}"))?;
 
     println!("Successfully wrote {} friends to file", friends.len());
     Ok(())
@@ -126,5 +126,5 @@ fn get_friends_file_path(data_dir: &Path) -> PathBuf {
 }
 
 fn ensure_data_dir_exists(data_dir: &Path) -> Result<(), String> {
-    fs::create_dir_all(data_dir).map_err(|e| format!("cannot create data directory: {}", e))
+    fs::create_dir_all(data_dir).map_err(|e| format!("cannot create data directory: {e}"))
 }
