@@ -42,10 +42,12 @@ jobs:
                   override: true
 
             - name: Format
-              run: cargo fmt --all -- --check
+              run: cd src-tauri |
+                cargo fmt --all -- --check
 
             - name: Clippy
-              run: cargo clippy --workspace --all-features --all-targets -- -D warnings
+              run: cd src-tauri |
+                cargo clippy --workspace --all-features --all-targets -- -D warnings
 
             - name: Install dependencies
               run: pnpm install
