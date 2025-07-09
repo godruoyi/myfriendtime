@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+target/
+src-tauri/
+*.min.js
+*.min.css
+coverage/
+.nyc_output/
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.log
+*.lock
+.github/
+.vscode/

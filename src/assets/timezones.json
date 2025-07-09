@@ -1,0 +1,22 @@
+[
+    { "label": "New York (EST)", "value": "America/New_York", "city": "New York", "country": "United States" },
+    { "label": "Los Angeles (PST)", "value": "America/Los_Angeles", "city": "Los Angeles", "country": "United States" },
+    { "label": "Chicago (CST)", "value": "America/Chicago", "city": "Chicago", "country": "United States" },
+    { "label": "London (GMT)", "value": "Europe/London", "city": "London", "country": "United Kingdom" },
+    { "label": "Tokyo (JST)", "value": "Asia/Tokyo", "city": "Tokyo", "country": "Japan" },
+    { "label": "Sydney (AEDT)", "value": "Australia/Sydney", "city": "Sydney", "country": "Australia" },
+    { "label": "Berlin (CET)", "value": "Europe/Berlin", "city": "Berlin", "country": "Germany" },
+    { "label": "Shanghai (CST)", "value": "Asia/Shanghai", "city": "Shanghai", "country": "China" },
+    { "label": "Paris (CET)", "value": "Europe/Paris", "city": "Paris", "country": "France" },
+    { "label": "Toronto (EST)", "value": "America/Toronto", "city": "Toronto", "country": "Canada" },
+    { "label": "Moscow (MSK)", "value": "Europe/Moscow", "city": "Moscow", "country": "Russia" },
+    { "label": "Mumbai (IST)", "value": "Asia/Kolkata", "city": "Mumbai", "country": "India" },
+    { "label": "São Paulo (BRT)", "value": "America/Sao_Paulo", "city": "São Paulo", "country": "Brazil" },
+    { "label": "Seoul (KST)", "value": "Asia/Seoul", "city": "Seoul", "country": "South Korea" },
+    { "label": "Singapore (SGT)", "value": "Asia/Singapore", "city": "Singapore", "country": "Singapore" },
+    { "label": "Hong Kong (HKT)", "value": "Asia/Hong_Kong", "city": "Hong Kong", "country": "Hong Kong" },
+    { "label": "Dubai (GST)", "value": "Asia/Dubai", "city": "Dubai", "country": "United Arab Emirates" },
+    { "label": "Mexico City (CST)", "value": "America/Mexico_City", "city": "Mexico City", "country": "Mexico" },
+    { "label": "Bangkok (ICT)", "value": "Asia/Bangkok", "city": "Bangkok", "country": "Thailand" },
+    { "label": "Rome (CET)", "value": "Europe/Rome", "city": "Rome", "country": "Italy" }
+]
