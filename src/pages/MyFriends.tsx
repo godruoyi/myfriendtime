@@ -6,7 +6,6 @@ import { Cog, Plus } from 'lucide-react';
 import TimeTravel from '../compontents/ui/TimeTravel.tsx';
 import FriendItem from '../compontents/ui/FriendItem.tsx';
 import MyTime from '../compontents/ui/MyTime.tsx';
-import { invoke } from '@tauri-apps/api/core';
 
 import '../assets/css/my_friends.css';
 
