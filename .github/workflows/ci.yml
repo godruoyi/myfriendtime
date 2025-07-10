@@ -53,6 +53,9 @@ jobs:
             - name: Run Prettier
               run: pnpm run lint:fix
 
-            - uses: autofix-ci/action@v1
+            - name: Auto commit lint fixes
+              uses: stefanzweifel/git-auto-commit-action@v6
               with:
-                commit-message: "chore: autofix code style"
+                  commit_message: 'style: auto-fix code formatting'
+                  commit_user_name: 'github-actions[bot]'
+                  commit_user_email: 'github-actions[bot]@users.noreply.github.com'
