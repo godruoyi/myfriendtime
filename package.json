@@ -16,6 +16,7 @@
         "@tauri-apps/plugin-opener": "^2",
         "@tauri-apps/plugin-shell": "^2.3.0",
         "@tauri-apps/plugin-store": "^2.3.0",
+        "@tauri-apps/plugin-updater": "^2.9.0",
         "@types/lodash-es": "^4.17.12",
         "framer-motion": "^12.23.0",
         "lodash-es": "^4.17.21",
