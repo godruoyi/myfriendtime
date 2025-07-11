@@ -1,0 +1,22 @@
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>macOS Menubar Template Icon</title>
+    <g id="Icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="centered-clock-elements" transform="translate(512, 512)">
+            <circle
+                cx="0"
+                cy="0"
+                r="280"
+                fill="none"
+                stroke="#000000"
+                stroke-width="50"
+                stroke-linecap="round"
+                stroke-dasharray="1319.47 439.82"
+                transform="rotate(125)"
+            />
+            <g id="clock-hands" stroke="#000000" stroke-width="60" stroke-linecap="round">
+                <path d="M0,0 L120,70" id="hour-hand"></path>
+                <path d="M0,0 L-100,173" id="minute-hand"></path>
+            </g>
+        </g>
+    </g>
+</svg>
