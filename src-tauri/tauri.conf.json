@@ -57,9 +57,7 @@
         "trayIcon": {
             "id": "tray-icon",
             "iconPath": "icons/icon.png",
-            "iconAsTemplate": true,
-            "tooltip": "Hello",
-            "menuOnLeftClick": false
+            "iconAsTemplate": false
         },
         "security": {
             "csp": null
