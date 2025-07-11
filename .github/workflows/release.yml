@@ -13,10 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
+          - platform: "macos-latest" # M1 and above
             args: "--target aarch64-apple-darwin --bundles dmg"
-          - platform: "macos-latest" # for Intel based macs.
-            args: "--target x86_64-apple-darwin --bundles dmg"
+        #   - platform: "macos-latest" # for Intel based macs.
+        #     args: "--target x86_64-apple-darwin --bundles dmg"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -44,9 +44,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__
-          releaseName: "App v__VERSION__"
+          tagName: v__VERSION__
+          releaseName: "MyFriendTime v__VERSION__"
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false
+          includeUpdaterJson: true
           args: ${{ matrix.args }}
