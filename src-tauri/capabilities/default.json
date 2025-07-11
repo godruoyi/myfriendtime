@@ -21,6 +21,7 @@
         "core:path:allow-join",
         "shell:allow-open",
         "store:allow-load",
+        "positioner:default",
         "store:default"
     ]
 }
