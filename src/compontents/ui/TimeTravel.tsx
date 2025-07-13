@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as times from '../../support/times.ts';
-import { RotateCcw } from 'lucide-react';
+import { Cog, Plus, RotateCcw } from 'lucide-react';
+import { api } from '../../api.ts';
 
 interface TimeTravelProps {
     onTimeOffsetChange: (offsetMinutes: number) => void;
@@ -16,11 +17,18 @@ export default function TimeTravel({ onTimeOffsetChange }: TimeTravelProps) {
     };
 
     return (
-        <div className="px-4 py-4 bg-gray-50 border-t border-gray-200">
+        <div className="px-4 py-2 bg-gray-100 border-t border-gray-200">
             <div className="flex items-center gap-3">
                 <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-gray-600">Time Travel</span>
+                        <div className="flex items-center gap-2">
+                            <button onClick={api.openSettingsWindow} className="rounded transition-colors">
+                                <Cog className="h-4 w-4 text-gray-600" />
+                            </button>
+                            <button onClick={api.openNewFriendWindow} className="rounded transition-colors">
+                                <Plus className="h-4 w-4 text-gray-600" />
+                            </button>
+                        </div>
                         <div className="flex items-center gap-1">
                             <span className="text-xs font-mono text-gray-700">{times.formatTimeOffset(timeOffset)}</span>
                             {timeOffset !== 0 && (

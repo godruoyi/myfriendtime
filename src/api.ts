@@ -34,20 +34,20 @@ export namespace api {
 
     // Image-related API calls
     export async function readImageAsBase64(filePath: string): Promise<string> {
-        return await invoke<string>('read_image_as_base64', { filePath });
+        return await invoke<string>('read_image_as_base64_command', { filePath });
     }
 
     // Autostart-related API calls
     export async function isAutostartEnabled(): Promise<boolean> {
-        return await invoke<boolean>('is_autostart_enabled');
+        return await invoke<boolean>('is_autostart_enabled_command');
     }
 
     export async function enableAutostart(): Promise<void> {
-        await invoke('enable_autostart');
+        await invoke('enable_autostart_command');
     }
 
     export async function disableAutostart(): Promise<void> {
-        await invoke('disable_autostart');
+        await invoke('disable_autostart_command');
     }
 
     // Window-related API calls

@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { api, Friend } from '../api';
 import { listen } from '@tauri-apps/api/event';
 import { load } from '@tauri-apps/plugin-store';
-import { Cog, Plus } from 'lucide-react';
 import TimeTravel from '../compontents/ui/TimeTravel.tsx';
 import FriendItem from '../compontents/ui/FriendItem.tsx';
 import MyTime from '../compontents/ui/MyTime.tsx';
@@ -13,9 +12,17 @@ export default function MyFriends() {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [userAvatar, setUserAvatar] = useState<string | null>(null);
     const [userName, setUserName] = useState<string>('Me');
-    const currentDate = new Date();
+    const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [timeOffsetMinutes, setTimeOffsetMinutes] = useState(0);
     const listenerSetupRef = useRef(false);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentDate(new Date());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -73,23 +80,6 @@ export default function MyFriends() {
 
     return (
         <div className="bg-white rounded-xl overflow-hidden">
-            <div className="bg-gray-50 pl-4 pr-3 py-4 flex items-center justify-between">
-                <div className="flex items-center">
-                    <h1 className="text-lg font-bold">
-                        <span className="text-gray-900">MyFriend</span>
-                        <span className="font-mono ml-0.5 text-[#E57C00]">Time</span>
-                    </h1>
-                </div>
-                <div className="flex items-center">
-                    <button onClick={api.openNewFriendWindow} className="w-7 h-7 rounded-full flex items-center justify-center transition-colors">
-                        <Plus className="h-5 w-5 text-gray-600" />
-                    </button>
-                    <button onClick={api.openSettingsWindow} className="w-7 h-7 rounded-full flex items-center justify-center transition-colors">
-                        <Cog className="h-5 w-5 text-gray-600" />
-                    </button>
-                </div>
-            </div>
-
             <MyTime currentDate={currentDate} timeOffsetMinutes={timeOffsetMinutes} userAvatar={userAvatar} userName={userName} />
 
             <div className="max-h-96 bg-white overflow-y-auto space-y-0 scrollbar-hide">
