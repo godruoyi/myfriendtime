@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api';
-import { message } from '@tauri-apps/plugin-dialog';
+import { ask, message } from '@tauri-apps/plugin-dialog';
 import { open } from '@tauri-apps/plugin-shell';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 
 export default function SettingGeneral(props: { startup?: boolean; onChange?: (key: string, value: any) => void }) {
     const startupSetting = props.startup ?? false;
     const [launchAtStartup, setLaunchAtStartup] = useState(startupSetting);
+    const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
 
     useEffect(() => {
         const checkAutostart = async () => {
@@ -41,6 +44,26 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
             });
         }
     };
+
+    const checkUpdates = async () => {
+        setIsCheckingUpdates(true);
+        try {
+            const update = await check();
+            if (update) {
+                const answer = await ask(`A new version ${update.version} is available. Would you like to update?`, {
+                    title: 'New Update Available',
+                    kind: 'warning',
+                });
+                if (answer) {
+                    await update.downloadAndInstall();
+                    await relaunch();
+                }
+            }
+        } finally {
+            setIsCheckingUpdates(false);
+        }
+    };
+
     return (
         <div className="flex-1 text-center">
             <SettingsRow label="Startup">
@@ -57,7 +80,7 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
                 label="Check for Updates"
                 description={
                     <span>
-                        Automatic updates are not available yet. Please visit{' '}
+                        Click to automatically update your app or manually install the latest version from{' '}
                         <a
                             href="#"
                             onClick={async e => {
@@ -67,18 +90,27 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
                             className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
                         >
                             GitHub Releases
-                        </a>{' '}
-                        to download and install the latest version manually.
+                        </a>
+                        .
                     </span>
                 }
             >
                 <button
-                    className="border border-gray-300 rounded-md px-2 text-[12px] text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1"
-                    onClick={async () => {
-                        await open('https://github.com/godruoyi/myfriendtime/releases');
-                    }}
+                    className="border border-gray-300 rounded-md px-2 text-[12px] text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1 disabled:opacity-60"
+                    onClick={checkUpdates}
+                    disabled={isCheckingUpdates}
                 >
-                    View Releases
+                    {isCheckingUpdates ? (
+                        <span className="flex items-center gap-1">
+                            <svg className="animate-spin h-4 w-4 text-gray-500" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                            </svg>
+                            Checking...
+                        </span>
+                    ) : (
+                        'Check for Updates'
+                    )}
                 </button>
             </SettingsRow>
 
