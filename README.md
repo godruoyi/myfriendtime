@@ -2,9 +2,10 @@
 
 An open-source macOS menubar app to keep track of your friends across different time zones.
 
----
-
 ## Description
+
+![MyFriendTime](https://github.com/user-attachments/assets/4eea797f-0824-4bad-aac0-a477008e0ad0)
+
 
 ## Installation
 
