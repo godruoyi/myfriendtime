@@ -47,6 +47,16 @@ If you prefer to build the application from the source code, you will need to ha
 
     The bundled application will be available in the `src-tauri/target/release/bundle/` directory.
 
+## Issues
+
+1. “myfriendtime.app” is damaged and can’t be opened. You should move it to the Trash.
+
+Our app is not notarized by Apple, so you may encounter this error when trying to open it for the first time. To bypass this, you can use the following command in your terminal:
+
+```bash
+sudo xattr -r -d com.apple.quarantine /Applications/myfriendtime.app
+```
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more information.
