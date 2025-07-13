@@ -25,7 +25,7 @@ export default function MyTime({ currentDate, timeOffsetMinutes, userAvatar, use
 
     useEffect(() => {
         setCurrentDateWithOffset(times.calculateTimeOffset(currentDate, timeOffsetMinutes || 0));
-    }, [timeOffsetMinutes]);
+    }, [timeOffsetMinutes, currentDate]);
 
     return (
         <div className="bg-gray-100 p-4 pb-2 border-b border-gray-200 relative">

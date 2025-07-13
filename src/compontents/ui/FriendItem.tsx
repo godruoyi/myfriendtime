@@ -26,13 +26,7 @@ export default function FriendItem({ friend, timeOffsetMinutes, currentDate }: P
             <div className="flex items-center gap-3">
                 <div className="relative flex-shrink-0">
                     <div className="h-11 w-11 ring-2 ring-gray-200 shadow-sm rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs">
-                        <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
-                        <span style={{ display: 'none' }}>
-                            {friend.name
-                                .split(' ')
-                                .map(n => n[0])
-                                .join('')}
-                        </span>
+                        <img src={friend.avatar} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-white ring-2 ring-white flex items-center justify-center">

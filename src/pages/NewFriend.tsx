@@ -73,17 +73,7 @@ export default function NewFriend() {
 
                 <div className="bg-white rounded-md border border-gray-200 shadow-lg p-6">
                     <div className="flex flex-col items-center space-y-6">
-                        <div className="relative w-full pb-8">
-                            <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 50" preserveAspectRatio="none">
-                                <path
-                                    d="M 12 28 L 12 46 L 86 46 L 86 28"
-                                    className="stroke-current text-gray-800 opacity-80"
-                                    strokeWidth="0.6"
-                                    fill="none"
-                                    strokeDasharray="2 1.6"
-                                />
-                            </svg>
-
+                        <div className="relative w-full">
                             <div className="relative z-10 flex items-center justify-between">
                                 <div className="flex flex-col items-start text-left">
                                     <div className="text-xs text-gray-500 mb-1">MY TIME</div>
@@ -115,7 +105,7 @@ export default function NewFriend() {
                                     placeholder="Enter your friend's name"
                                     className="w-full px-2 py-1 text-sm text-gray-600 bg-white border border-gray-300
                                         rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                                        focus:border-blue-500 transition-all duration-200 placeholder-gray-600
+                                        focus:border-blue-500 transition-all duration-200 placeholder-gray-400
                                         hover:border-gray-400"
                                 />
                             </div>
@@ -126,10 +116,11 @@ export default function NewFriend() {
                                     <select
                                         value={selectedTimezone}
                                         onChange={e => setSelectedTimezone(e.target.value)}
-                                        className="w-full px-2 py-1 text-sm text-gray-600 bg-white border border-gray-300 rounded-md shadow-sm
-                                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                               transition-all duration-200 appearance-none cursor-pointer
-                                               hover:border-gray-400 pr-10"
+                                        className={`w-full px-2 py-1 text-sm bg-white border border-gray-300 rounded-md shadow-sm
+                                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                            transition-all duration-200 appearance-none cursor-pointer
+                                            hover:border-gray-400 pr-10
+                                            ${selectedTimezone === '' ? 'text-gray-400' : 'text-gray-600'}`}
                                     >
                                         <option value="" disabled>
                                             Select a timezone

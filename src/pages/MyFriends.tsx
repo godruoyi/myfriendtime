@@ -60,21 +60,16 @@ export default function MyFriends() {
         let unlisten: (() => void) | null = null;
 
         const setupEventListener = async () => {
-            try {
-                unlisten = await listen<Friend>('friend-added', event => {
-                    const friend = event.payload as Friend;
-                    setFriends(prev => [...prev, friend]);
-                });
-            } catch (error) {
-                listenerSetupRef.current = false;
-            }
+            unlisten = await listen<Friend>('friend-added', event => {
+                const friend = event.payload as Friend;
+                setFriends(prev => [...prev, friend]);
+            });
         };
 
         setupEventListener();
 
         return () => {
             unlisten?.();
-            listenerSetupRef.current = false;
         };
     }, []);
 
