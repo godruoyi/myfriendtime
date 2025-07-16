@@ -32,7 +32,7 @@ export default function MyTime({ currentDate, timeOffsetMinutes, userAvatar, use
             <div className="flex justify-between">
                 <div className="flex-1 min-w-0 ">
                     <div className="flex flex-col gap-1.5">
-                        <img src={userAvatarSrc} alt={userName || 'Me'} className="w-12 h-12 object-cover rounded-md border-2 border-white" />
+                        <img src={userAvatarSrc} alt={userName || 'Me'} className="w-15 h-15 object-cover rounded-md border-2 border-white" />
                         <p className="text-base font-mono font-bold text-[#1f2937] truncate">{userName || 'Me'}</p>
                     </div>
                 </div>
@@ -40,7 +40,7 @@ export default function MyTime({ currentDate, timeOffsetMinutes, userAvatar, use
                 <div className="text-right flex-shrink-0 ml-3 flex flex-col justify-between">
                     <p className="text-2xl font-mono font-bold text-[#1f2937]">{formatTime}</p>
                     <div className="self-end">
-                        <p className="text-sm text-gray-600 font-medium">{formatDate}</p>
+                        <p className="text-sm font-bold text-gray-600 font-medium">{formatDate}</p>
                         <p className="text-xs text-gray-600 font-medium">{timeZoneName}</p>
                     </div>
                 </div>
