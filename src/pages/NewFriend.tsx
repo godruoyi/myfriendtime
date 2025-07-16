@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { api } from '../api';
 import * as times from '../support/times.ts';
-import timezones from '../assets/timezones.json';
 import '../assets/css/new_friend.css';
 import Upload from '../compontents/images/Upload.tsx';
+import SearchableSelect from '../compontents/SearchableSelect.tsx';
+import { Country, CountryTimezone, filterCountries, mockFetchCountryDetails } from '../support/country.ts';
+import { message } from '@tauri-apps/plugin-dialog';
+import allCountriesData from '../assets/countries.json';
 
 export default function NewFriend() {
     const [friendName, setFriendName] = useState('');
     const [friendAvatar, setFriendAvatar] = useState<string | null>(null);
     const [selectedTimezone, setSelectedTimezone] = useState('');
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+    const [countryTimezones, setCountryTimezones] = useState<CountryTimezone[]>([]);
+    const [loadingTimezones, setLoadingTimezones] = useState(false);
+    const canSave = friendName.trim() && selectedTimezone;
 
     useEffect(() => {
         const updateTime = () => {
@@ -28,23 +34,19 @@ export default function NewFriend() {
     }, []);
 
     const handleSave = async () => {
-        if (!friendName.trim() || !selectedTimezone) {
+        if (!friendName.trim() || !selectedTimezone || !selectedCountry) {
             return;
         }
 
-        const timezone = timezones.find(tz => tz.value === selectedTimezone);
-        if (!timezone) {
-            console.error('invalid timezone selected:', selectedTimezone);
-            return;
-        }
+        const city = selectedTimezone.split('/')[1] || selectedCountry?.capital || selectedTimezone;
 
         try {
             await api.addFriend({
                 name: friendName.trim(),
                 avatar: friendAvatar || '',
-                timezone: timezone.value,
-                city: timezone.city,
-                country: timezone.country,
+                timezone: selectedTimezone,
+                city: city,
+                country: selectedCountry?.name || '',
             });
 
             setFriendName('');
@@ -57,10 +59,39 @@ export default function NewFriend() {
         }
     };
 
-    const canSave = friendName.trim() && selectedTimezone;
+    useEffect(() => {
+        setCountryTimezones([]);
+        setSelectedTimezone('');
+
+        if (!selectedCountry) {
+            return;
+        }
+
+        const loadTimezones = async () => {
+            try {
+                setLoadingTimezones(true);
+                // const timezones = await getCountryTimezone(selectedCountry);
+                const timezones = await mockFetchCountryDetails(selectedCountry.iso2 as string);
+                setCountryTimezones(timezones);
+                if (timezones.length === 1) {
+                    setSelectedTimezone(timezones[0].value);
+                }
+            } catch (err) {
+                await message(`${err}`, {
+                    title: 'Failed to Load Timezones',
+                    kind: 'error',
+                });
+                setCountryTimezones([]);
+            } finally {
+                setLoadingTimezones(false);
+            }
+        };
+
+        loadTimezones();
+    }, [selectedCountry]);
 
     return (
-        <div className="bg-[#F6F6F6] flex flex-col pb-6">
+        <div className="bg-[#F6F6F6] flex flex-col pb-1">
             <div className="px-6">
                 <div className="py-4">
                     <div className="text-left">
@@ -97,6 +128,50 @@ export default function NewFriend() {
 
                         <div className="w-full space-y-4">
                             <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-700">Friend's Timezone</label>
+
+                                <div className="flex w-full gap-1">
+                                    <div className="w-1/2 text-left text-gray-600">
+                                        <SearchableSelect
+                                            placeholder="search country..."
+                                            options={allCountriesData}
+                                            value={selectedCountry}
+                                            onChange={setSelectedCountry}
+                                            getOptionLabel={c => (c ? `${c.name} (${c.iso2})` : '')}
+                                            getOptionValue={c => c.id}
+                                            filterFn={filterCountries}
+                                        />
+                                    </div>
+                                    <div className="w-1/2 text-left text-gray-600">
+                                        <select
+                                            className={`w-full text-sm px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm
+                                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                                transition-all duration-200 appearance-none cursor-pointer
+                                                hover:border-gray-400 text-gray-500
+                                            `}
+                                            value={selectedTimezone}
+                                            onChange={e => {
+                                                setSelectedTimezone(e.target.value);
+                                            }}
+                                            disabled={!selectedCountry || loadingTimezones}
+                                        >
+                                            <option value="" disabled>
+                                                {loadingTimezones
+                                                    ? 'Loading...'
+                                                    : selectedCountry
+                                                      ? 'Select Timezone...'
+                                                      : 'Please select a country first'}
+                                            </option>
+                                            {countryTimezones.map(tz => (
+                                                <option key={tz.value} value={tz.value}>
+                                                    {`${tz.label})`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
                                 <label className="block text-sm font-medium text-gray-700">Friend's Name</label>
                                 <input
                                     type="text"
@@ -108,34 +183,6 @@ export default function NewFriend() {
                                         focus:border-blue-500 transition-all duration-200 placeholder-gray-400
                                         hover:border-gray-400"
                                 />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Friend's Timezone</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedTimezone}
-                                        onChange={e => setSelectedTimezone(e.target.value)}
-                                        className={`w-full px-2 py-1 text-sm bg-white border border-gray-300 rounded-md shadow-sm
-                                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                            transition-all duration-200 appearance-none cursor-pointer
-                                            hover:border-gray-400 pr-10
-                                            ${selectedTimezone === '' ? 'text-gray-400' : 'text-gray-600'}`}
-                                    >
-                                        <option value="" disabled>
-                                            Select a timezone
-                                        </option>
-                                        {timezones.map(timezone => (
-                                            <option key={timezone.value} value={timezone.value}>
-                                                {timezone.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown
-                                        size={16}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                                    />
-                                </div>
                             </div>
                         </div>
                     </div>
