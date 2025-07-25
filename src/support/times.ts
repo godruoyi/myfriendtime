@@ -38,6 +38,14 @@ export const formatDate = (date: Date, timezone: string) => {
     }).format(date);
 };
 
+export const formatDateWithoutWeek = (date: Date, timezone: string) => {
+    return new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        month: 'short',
+        day: 'numeric',
+    }).format(date);
+};
+
 export const formatTimeOffset = (offset: number) => {
     if (offset === 0) {
         return 'Now';

@@ -57,7 +57,7 @@ fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
 
                 if !is_any_app_window_focused {
                     if let Some(main_window) = app_handle.get_window("main") {
-                        main_window.hide().unwrap();
+                        // main_window.hide().unwrap();
                     }
                 }
             });

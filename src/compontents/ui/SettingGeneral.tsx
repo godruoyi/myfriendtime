@@ -4,11 +4,13 @@ import { ask, message } from '@tauri-apps/plugin-dialog';
 import { open } from '@tauri-apps/plugin-shell';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { getVersion } from '@tauri-apps/api/app';
 
 export default function SettingGeneral(props: { startup?: boolean; onChange?: (key: string, value: any) => void }) {
     const startupSetting = props.startup ?? false;
     const [launchAtStartup, setLaunchAtStartup] = useState(startupSetting);
     const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
+    const [version, setVersion] = useState('');
 
     useEffect(() => {
         const checkAutostart = async () => {
@@ -17,6 +19,7 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
         };
 
         checkAutostart();
+        getVersion().then(setVersion);
     }, []);
 
     useEffect(() => {
@@ -58,6 +61,11 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
                     await update.downloadAndInstall();
                     await relaunch();
                 }
+            } else {
+                await message('You are already using the latest version.', {
+                    title: 'No Updates Available',
+                    kind: 'info',
+                });
             }
         } finally {
             setIsCheckingUpdates(false);
@@ -80,7 +88,7 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
                 label="Check for Updates"
                 description={
                     <span>
-                        Click to automatically update your app or manually install the latest version from{' '}
+                        Current version: <strong>{version}</strong>, you can also manually install the latest version from{' '}
                         <a
                             href="#"
                             onClick={async e => {

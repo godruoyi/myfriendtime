@@ -5,9 +5,7 @@ import * as times from '../support/times.ts';
 import '../assets/css/new_friend.css';
 import Upload from '../compontents/images/Upload.tsx';
 import SearchableSelect from '../compontents/SearchableSelect.tsx';
-import { Country, CountryTimezone, filterCountries, mockFetchCountryDetails } from '../support/country.ts';
-import { message } from '@tauri-apps/plugin-dialog';
-import allCountriesData from '../assets/countries.json';
+import { Countries, Country, CountryTimezone, filterCountries } from '../support/country.ts';
 
 export default function NewFriend() {
     const [friendName, setFriendName] = useState('');
@@ -16,7 +14,6 @@ export default function NewFriend() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
     const [countryTimezones, setCountryTimezones] = useState<CountryTimezone[]>([]);
-    const [loadingTimezones, setLoadingTimezones] = useState(false);
     const canSave = friendName.trim() && selectedTimezone;
 
     useEffect(() => {
@@ -67,27 +64,11 @@ export default function NewFriend() {
             return;
         }
 
-        const loadTimezones = async () => {
-            try {
-                setLoadingTimezones(true);
-                // const timezones = await getCountryTimezone(selectedCountry);
-                const timezones = await mockFetchCountryDetails(selectedCountry.iso2 as string);
-                setCountryTimezones(timezones);
-                if (timezones.length === 1) {
-                    setSelectedTimezone(timezones[0].value);
-                }
-            } catch (err) {
-                await message(`${err}`, {
-                    title: 'Failed to Load Timezones',
-                    kind: 'error',
-                });
-                setCountryTimezones([]);
-            } finally {
-                setLoadingTimezones(false);
-            }
-        };
-
-        loadTimezones();
+        const timezones = selectedCountry.timezones || [];
+        setCountryTimezones(timezones);
+        if (timezones.length === 1) {
+            setSelectedTimezone(timezones[0].zoneName as string);
+        }
     }, [selectedCountry]);
 
     return (
@@ -133,8 +114,8 @@ export default function NewFriend() {
                                 <div className="flex w-full gap-1">
                                     <div className="w-1/2 text-left text-gray-600">
                                         <SearchableSelect
-                                            placeholder="search country..."
-                                            options={allCountriesData}
+                                            placeholder="Select & Search Country"
+                                            options={Countries}
                                             value={selectedCountry}
                                             onChange={setSelectedCountry}
                                             getOptionLabel={c => (c ? `${c.name} (${c.iso2})` : '')}
@@ -153,18 +134,14 @@ export default function NewFriend() {
                                             onChange={e => {
                                                 setSelectedTimezone(e.target.value);
                                             }}
-                                            disabled={!selectedCountry || loadingTimezones}
+                                            disabled={!selectedCountry}
                                         >
                                             <option value="" disabled>
-                                                {loadingTimezones
-                                                    ? 'Loading...'
-                                                    : selectedCountry
-                                                      ? 'Select Timezone...'
-                                                      : 'Please select a country first'}
+                                                {selectedCountry ? 'Select Timezone...' : 'Please select a country'}
                                             </option>
                                             {countryTimezones.map(tz => (
-                                                <option key={tz.value} value={tz.value}>
-                                                    {`${tz.label})`}
+                                                <option key={tz.zoneName} value={tz.zoneName}>
+                                                    {`${tz.zoneName} (${tz.abbreviation})`}
                                                 </option>
                                             ))}
                                         </select>

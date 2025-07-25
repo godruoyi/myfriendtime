@@ -74,7 +74,7 @@ export default function MyFriends() {
     }, []);
 
     return (
-        <div className="bg-white rounded-xl overflow-hidden">
+        <div className="bg-white rounded-md overflow-hidden">
             <MyTime currentDate={currentDate} timeOffsetMinutes={timeOffsetMinutes} userAvatar={userAvatar} userName={userName} />
 
             <div className="max-h-96 bg-white overflow-y-auto space-y-0 scrollbar-hide">

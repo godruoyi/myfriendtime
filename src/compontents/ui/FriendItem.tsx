@@ -25,7 +25,7 @@ export default function FriendItem({ friend, timeOffsetMinutes, currentDate }: P
         <div key={friend.id} className="px-4 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0">
             <div className="flex items-center gap-3">
                 <div className="relative flex-shrink-0">
-                    <div className="h-11 w-11 ring-2 ring-gray-200 shadow-sm rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs">
+                    <div className="h-12 w-12 ring-2 ring-gray-200 shadow-sm rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs">
                         <img src={friend.avatar} className="w-full h-full object-cover" />
                     </div>
 
