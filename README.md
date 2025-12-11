@@ -2,7 +2,9 @@
 
 An open-source macOS menubar app to keep track of your friends across different time zones.
 
-## Description
+## Screenshot
+
+![MyFriendTime Setting](https://github.com/user-attachments/assets/e327ac07-b78b-40de-8d33-ec64870d5ba4)
 
 ![MyFriendTime](https://github.com/user-attachments/assets/4eea797f-0824-4bad-aac0-a477008e0ad0)
 
@@ -56,6 +58,10 @@ Our app is not notarized by Apple, so you may encounter this error when trying t
 ```bash
 sudo xattr -r -d com.apple.quarantine /Applications/myfriendtime.app
 ```
+
+2. We cannot support delete/edit friend right now, please open `friends.json` and edit it manually.
+
+MacOS: `~/Library/Application Support/app.myfriendtime/friends.json`
 
 ## License
 
