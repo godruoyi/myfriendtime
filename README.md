@@ -4,7 +4,7 @@ An open-source macOS menubar app to keep track of your friends across different 
 
 ## Screenshot
 
-![MyFriendTime Setting](https://github.com/user-attachments/assets/e327ac07-b78b-40de-8d33-ec64870d5ba4)
+![MyFriendTime Setting](https://github.com/user-attachments/assets/ccafd582-ec0a-47f1-8783-18094b192a8f)
 
 ![MyFriendTime](https://github.com/user-attachments/assets/4eea797f-0824-4bad-aac0-a477008e0ad0)
 
