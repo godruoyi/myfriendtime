@@ -9,7 +9,6 @@ import CalendarView from '../compontents/ui/CalendarView.tsx';
 
 import '../assets/css/my_friends.css';
 
-
 export default function MyFriends() {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [userAvatar, setUserAvatar] = useState<string | null>(null);
