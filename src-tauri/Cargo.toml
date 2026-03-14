@@ -18,10 +18,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["macos-private-api", "tray-icon", "unstable"] }
-tauri-plugin-opener = "2"
-tauri-plugin-dialog = "2"
-tauri-plugin-store = "2"
+tauri = { version = "2.10", features = ["macos-private-api", "tray-icon", "unstable"] }
+tauri-plugin-opener = "2.5"
+tauri-plugin-dialog = "2.6"
+tauri-plugin-store = "2.4"
 base64 = "0.21"
 uuid = { version = "1.0", features = ["v4"] }
 serde = { version = "1", features = ["derive"] }
@@ -33,4 +33,4 @@ tauri-plugin-process = "2.3.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.5.0"
-tauri-plugin-updater = "2.9.0"
+tauri-plugin-updater = "2.10"

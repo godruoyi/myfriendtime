@@ -25,3 +25,5 @@ package-lock.json
 *.sw?
 
 src/bindings.ts
+
+.claude
