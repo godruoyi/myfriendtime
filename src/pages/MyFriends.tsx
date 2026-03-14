@@ -102,8 +102,6 @@ export default function MyFriends() {
                 )}
             </div>
 
-            <TimeTravel onTimeOffsetChange={v => setTimeOffsetMinutes(v)} />
-
             {calendarViewEnabled && (
                 <CalendarView
                     currentDate={currentDate}
@@ -122,6 +120,7 @@ export default function MyFriends() {
                     }}
                 />
             )}
+            <TimeTravel onTimeOffsetChange={v => setTimeOffsetMinutes(v)} />
         </div>
     );
 }

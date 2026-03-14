@@ -20,7 +20,7 @@ export default function TimeTravel({ onTimeOffsetChange }: TimeTravelProps) {
         <div className="px-4 py-2 bg-gray-100 border-t border-gray-200">
             <div className="flex items-center gap-3">
                 <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <button onClick={api.openSettingsWindow} className="rounded transition-colors">
                                 <Cog className="h-4 w-4 text-gray-600" />
@@ -59,11 +59,11 @@ export default function TimeTravel({ onTimeOffsetChange }: TimeTravelProps) {
                         }}
                     />
 
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    {/*<div className="flex justify-between text-xs text-gray-400 mt-1">
                         <span>-12h</span>
                         <span>Now</span>
                         <span>+12h</span>
-                    </div>
+                    </div>*/}
                 </div>
             </div>
         </div>

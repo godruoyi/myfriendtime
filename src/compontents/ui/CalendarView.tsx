@@ -55,7 +55,7 @@ export default function CalendarView({ currentDate, onDateSelect }: CalendarView
     while (cells.length % 7 !== 0) cells.push(null);
 
     return (
-        <div className="px-4 py-2 bg-white border-b border-gray-200">
+        <div className="px-4 py-2 bg-gray-100 border-t border-gray-200">
             <div className="flex items-center justify-between mb-1">
                 <button onClick={prevMonth} className="p-0.5 rounded hover:bg-gray-100 transition-colors">
                     <ChevronLeft className="h-4 w-4 text-gray-600" />
