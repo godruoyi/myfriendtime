@@ -13,7 +13,15 @@ type SettingsTab = 'general' | 'about' | 'profile';
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
-    const store = new LazyStore('user-settings.json', { autoSave: true });
+    const store = new LazyStore('user-settings.json', {
+        autoSave: true,
+        defaults: {
+            user_name: 'MyFriendTime',
+            user_avatar_path: '',
+            launch_at_startup: false,
+            calendar_view_enabled: false,
+        }
+    });
     const [username, setUsername] = useState<string>('');
     const [userAvatarPath, setUserAvatarPath] = useState<string>('');
     const [startup, setStartup] = useState<boolean>(false);
