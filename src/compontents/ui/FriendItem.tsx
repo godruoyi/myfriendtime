@@ -7,10 +7,14 @@ interface Props {
     friend: Friend;
     timeOffsetMinutes?: number;
     currentDate: Date;
+    isRebased?: boolean;
+    onRebaseClick?: () => void;
+    onCancelRebase?: () => void;
 }
 
-export default function FriendItem({ friend, timeOffsetMinutes, currentDate }: Props) {
+export default function FriendItem({ friend, timeOffsetMinutes, currentDate, isRebased, onRebaseClick, onCancelRebase }: Props) {
     const [currentDateWithOffset, setCurrentDateWithOffset] = useState<Date>(currentDate);
+
     const formatDate = times.formatDate(currentDateWithOffset, friend.timezone);
     const formatTime = times.formatTime(currentDateWithOffset, friend.timezone);
     const hourOffset = times.getOffsetFromLocal(currentDateWithOffset, friend.timezone);
@@ -21,11 +25,30 @@ export default function FriendItem({ friend, timeOffsetMinutes, currentDate }: P
 
     const { IconComponent, IconColor } = calculateTimeIcon(friend.timezone, currentDateWithOffset);
 
+    const handleAvatarClick = () => {
+        if (isRebased) {
+            onCancelRebase?.();
+        } else {
+            onRebaseClick?.();
+        }
+    };
+
     return (
-        <div key={friend.id} className="px-4 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0">
+        <div
+            key={friend.id}
+            className={`px-4 py-4 border-b border-gray-50 last:border-b-0 transition-colors ${isRebased ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+        >
             <div className="flex items-center gap-3">
-                <div className="relative flex-shrink-0">
-                    <div className="h-12 w-12 ring-2 ring-gray-200 shadow-sm rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs">
+                <div
+                    className="relative flex-shrink-0 cursor-pointer"
+                    onClick={handleAvatarClick}
+                    title={isRebased ? 'Cancel rebase' : 'Set as base timezone'}
+                >
+                    <div
+                        className={`h-12 w-12 ring-2 rounded-full overflow-hidden bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs transition-all ${
+                            isRebased ? 'ring-blue-500 shadow-lg shadow-blue-200' : 'ring-gray-200 shadow-sm'
+                        }`}
+                    >
                         <img src={friend.avatar} className="w-full h-full object-cover" />
                     </div>
 

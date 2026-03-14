@@ -1,13 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { api, Friend } from '../api';
 import { listen } from '@tauri-apps/api/event';
-import { load } from '@tauri-apps/plugin-store';
+import { LazyStore } from '@tauri-apps/plugin-store';
 import TimeTravel from '../compontents/ui/TimeTravel.tsx';
 import FriendItem from '../compontents/ui/FriendItem.tsx';
 import MyTime from '../compontents/ui/MyTime.tsx';
 import CalendarView from '../compontents/ui/CalendarView.tsx';
 
 import '../assets/css/my_friends.css';
+
 
 export default function MyFriends() {
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -16,6 +17,7 @@ export default function MyFriends() {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [timeOffsetMinutes, setTimeOffsetMinutes] = useState(0);
     const [calendarViewEnabled, setCalendarViewEnabled] = useState(false);
+    const [rebasedFriendId, setRebasedFriendId] = useState<string | null>(null);
     const listenerSetupRef = useRef(false);
     const selectedDateRef = useRef<{ year: number; month: number; day: number } | null>(null);
 
@@ -39,14 +41,16 @@ export default function MyFriends() {
         };
 
         const loadUserSettings = async () => {
-            const store = await load('user-settings.json', { autoSave: true });
+            const store = new LazyStore('user-settings.json', { autoSave: true, defaults: {} });
             const name = await store.get<string>('user_name');
             const avatarPath = await store.get<string>('user_avatar_path');
             const calendarView = await store.get<boolean>('calendar_view_enabled');
+            const rebasedId = await store.get<string | null>('rebased_friend_id');
 
             setUserName(name || 'MyFriendTime');
             setUserAvatar(avatarPath || null);
             setCalendarViewEnabled(calendarView ?? false);
+            setRebasedFriendId(rebasedId || null);
 
             store.onChange((key, value) => {
                 if (key === 'user_name') {
@@ -55,6 +59,8 @@ export default function MyFriends() {
                     setUserAvatar(value as string);
                 } else if (key === 'calendar_view_enabled') {
                     setCalendarViewEnabled(value as boolean);
+                } else if (key === 'rebased_friend_id') {
+                    setRebasedFriendId(value as string | null);
                 }
             });
         };
@@ -85,6 +91,18 @@ export default function MyFriends() {
         };
     }, []);
 
+    const handleRebase = async (friendId: string) => {
+        setRebasedFriendId(friendId);
+        const store = new LazyStore('user-settings.json', { autoSave: true, defaults: {} });
+        await store.set('rebased_friend_id', friendId);
+    };
+
+    const handleCancelRebase = async () => {
+        setRebasedFriendId(null);
+        const store = new LazyStore('user-settings.json', { autoSave: true, defaults: {} });
+        await store.set('rebased_friend_id', null);
+    };
+
     return (
         <div className="bg-white rounded-md overflow-hidden">
             <MyTime currentDate={currentDate} timeOffsetMinutes={timeOffsetMinutes} userAvatar={userAvatar} userName={userName} />
@@ -97,7 +115,15 @@ export default function MyFriends() {
                     </div>
                 ) : (
                     friends.map(friend => (
-                        <FriendItem friend={friend} key={friend.id} timeOffsetMinutes={timeOffsetMinutes} currentDate={currentDate} />
+                        <FriendItem
+                            friend={friend}
+                            key={friend.id}
+                            timeOffsetMinutes={timeOffsetMinutes}
+                            currentDate={currentDate}
+                            isRebased={rebasedFriendId === friend.id}
+                            onRebaseClick={() => handleRebase(friend.id)}
+                            onCancelRebase={handleCancelRebase}
+                        />
                     ))
                 )}
             </div>
