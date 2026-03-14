@@ -17,6 +17,7 @@ export default function Settings() {
     const [username, setUsername] = useState<string>('');
     const [userAvatarPath, setUserAvatarPath] = useState<string>('');
     const [startup, setStartup] = useState<boolean>(false);
+    const [calendarViewEnabled, setCalendarViewEnabled] = useState<boolean>(false);
 
     useEffect(() => {
         async function initializeSettings() {
@@ -24,10 +25,12 @@ export default function Settings() {
                 const name = await store.get<string>('user_name');
                 const avatarPath = await store.get<string>('user_avatar_path');
                 const startup = await store.get<boolean>('launch_at_startup');
+                const calendarView = await store.get<boolean>('calendar_view_enabled');
 
                 setUsername(name || 'MyFriendTime');
                 setUserAvatarPath(avatarPath || '');
                 setStartup(startup !== undefined ? startup : false);
+                setCalendarViewEnabled(calendarView !== undefined ? calendarView : false);
             } catch (error) {
                 console.error('Error initializing settings:', error);
             }
@@ -44,6 +47,8 @@ export default function Settings() {
             setUserAvatarPath(value);
         } else if (key === 'launch_at_startup') {
             setStartup(value);
+        } else if (key === 'calendar_view_enabled') {
+            setCalendarViewEnabled(value);
         }
     };
 
@@ -53,7 +58,9 @@ export default function Settings() {
 
             <div className="flex-1 overflow-y-auto">
                 <div className="px-6 pb-6 pt-4">
-                    {activeTab === 'general' && <SettingGeneral startup={startup} onChange={handleSettingsChange} />}
+                    {activeTab === 'general' && (
+                        <SettingGeneral startup={startup} calendarView={calendarViewEnabled} onChange={handleSettingsChange} />
+                    )}
                     {activeTab === 'about' && <SettingAbout />}
                     {activeTab === 'profile' && <SettingProfile username={username} avatar={userAvatarPath} onChange={handleSettingsChange} />}
                 </div>
