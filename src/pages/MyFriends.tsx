@@ -106,7 +106,7 @@ export default function MyFriends() {
         <div className="bg-white rounded-md overflow-hidden">
             <MyTime currentDate={currentDate} timeOffsetMinutes={timeOffsetMinutes} userAvatar={userAvatar} userName={userName} />
 
-            <div className="max-h-96 bg-white overflow-y-auto space-y-0 scrollbar-hide">
+            <div className="max-h-100 bg-white overflow-y-auto space-y-0 scrollbar-hide">
                 {friends.length === 0 ? (
                     <div className="px-4 py-8 text-center text-gray-500">
                         <p className="text-sm">No friends added yet</p>
