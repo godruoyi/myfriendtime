@@ -6,9 +6,10 @@ import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
 
-export default function SettingGeneral(props: { startup?: boolean; onChange?: (key: string, value: any) => void }) {
+export default function SettingGeneral(props: { startup?: boolean; calendarView?: boolean; onChange?: (key: string, value: any) => void }) {
     const startupSetting = props.startup ?? false;
     const [launchAtStartup, setLaunchAtStartup] = useState(startupSetting);
+    const [calendarViewEnabled, setCalendarViewEnabled] = useState(props.calendarView ?? false);
     const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
     const [version, setVersion] = useState('');
 
@@ -27,6 +28,17 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
             setLaunchAtStartup(props.startup);
         }
     }, [props.startup]);
+
+    useEffect(() => {
+        if (props.calendarView !== undefined) {
+            setCalendarViewEnabled(props.calendarView);
+        }
+    }, [props.calendarView]);
+
+    const handleCalendarViewChange = (checked: boolean) => {
+        setCalendarViewEnabled(checked);
+        props.onChange?.('calendar_view_enabled', checked);
+    };
 
     const handleLaunchAtStartupChange = async (checked: boolean) => {
         const originalValue = launchAtStartup;
@@ -82,6 +94,16 @@ export default function SettingGeneral(props: { startup?: boolean; onChange?: (k
                     className="h-4 w-4 text-blue-600 focus:ring-blue-700 border-gray-300 rounded"
                 />
                 <span className="ml-2 text-sm text-gray-600">Start at Login</span>
+            </SettingsRow>
+
+            <SettingsRow label="Calendar View" description="Show a monthly calendar in the main view for date navigation.">
+                <input
+                    type="checkbox"
+                    checked={calendarViewEnabled}
+                    onChange={e => handleCalendarViewChange(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-700 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-600">Enable Calendar View</span>
             </SettingsRow>
 
             <SettingsRow

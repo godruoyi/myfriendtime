@@ -5,6 +5,7 @@ import { load } from '@tauri-apps/plugin-store';
 import TimeTravel from '../compontents/ui/TimeTravel.tsx';
 import FriendItem from '../compontents/ui/FriendItem.tsx';
 import MyTime from '../compontents/ui/MyTime.tsx';
+import CalendarView from '../compontents/ui/CalendarView.tsx';
 
 import '../assets/css/my_friends.css';
 
@@ -14,11 +15,18 @@ export default function MyFriends() {
     const [userName, setUserName] = useState<string>('Me');
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [timeOffsetMinutes, setTimeOffsetMinutes] = useState(0);
+    const [calendarViewEnabled, setCalendarViewEnabled] = useState(false);
     const listenerSetupRef = useRef(false);
+    const selectedDateRef = useRef<{ year: number; month: number; day: number } | null>(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentDate(new Date());
+            const now = new Date();
+            if (selectedDateRef.current) {
+                const { year, month, day } = selectedDateRef.current;
+                now.setFullYear(year, month, day);
+            }
+            setCurrentDate(now);
         }, 1000);
 
         return () => clearInterval(interval);
@@ -34,15 +42,19 @@ export default function MyFriends() {
             const store = await load('user-settings.json', { autoSave: true });
             const name = await store.get<string>('user_name');
             const avatarPath = await store.get<string>('user_avatar_path');
+            const calendarView = await store.get<boolean>('calendar_view_enabled');
 
             setUserName(name || 'MyFriendTime');
             setUserAvatar(avatarPath || null);
+            setCalendarViewEnabled(calendarView ?? false);
 
             store.onChange((key, value) => {
                 if (key === 'user_name') {
                     setUserName(value as string);
                 } else if (key === 'user_avatar_path') {
                     setUserAvatar(value as string);
+                } else if (key === 'calendar_view_enabled') {
+                    setCalendarViewEnabled(value as boolean);
                 }
             });
         };
@@ -91,6 +103,25 @@ export default function MyFriends() {
             </div>
 
             <TimeTravel onTimeOffsetChange={v => setTimeOffsetMinutes(v)} />
+
+            {calendarViewEnabled && (
+                <CalendarView
+                    currentDate={currentDate}
+                    onDateSelect={date => {
+                        const today = new Date();
+                        if (
+                            date.getFullYear() === today.getFullYear() &&
+                            date.getMonth() === today.getMonth() &&
+                            date.getDate() === today.getDate()
+                        ) {
+                            selectedDateRef.current = null;
+                        } else {
+                            selectedDateRef.current = { year: date.getFullYear(), month: date.getMonth(), day: date.getDate() };
+                        }
+                        setCurrentDate(date);
+                    }}
+                />
+            )}
         </div>
     );
 }
