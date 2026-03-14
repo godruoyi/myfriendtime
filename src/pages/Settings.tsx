@@ -20,7 +20,7 @@ export default function Settings() {
             user_avatar_path: '',
             launch_at_startup: false,
             calendar_view_enabled: false,
-        }
+        },
     });
     const [username, setUsername] = useState<string>('');
     const [userAvatarPath, setUserAvatarPath] = useState<string>('');
