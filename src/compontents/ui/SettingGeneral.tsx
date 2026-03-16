@@ -174,13 +174,13 @@ export default function SettingGeneral(props: { startup?: boolean; calendarView?
 
             <SettingsRow
                 label="Config File"
-                description="Open the friends.json config file with your system's default application."
+                description="Reveal the friends.json config file in Finder."
             >
                 <button
                     className="border border-gray-300 rounded-md px-2 text-[12px] text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1"
                     onClick={() => api.openFriendsJson()}
                 >
-                    Open friends.json
+                    Reveal in Finder
                 </button>
             </SettingsRow>
 

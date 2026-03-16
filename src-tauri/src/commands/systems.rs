@@ -66,8 +66,8 @@ pub fn open_friends_json_command(app_handle: tauri::AppHandle) -> Result<(), Str
 
     app_handle
         .opener()
-        .open_path(&friends_file, None::<&str>)
-        .map_err(|e| format!("Failed to open friends.json: {e}"))
+        .reveal_item_in_dir(&friends_file)
+        .map_err(|e| format!("Failed to reveal friends.json: {e}"))
 }
 
 #[tauri::command]
