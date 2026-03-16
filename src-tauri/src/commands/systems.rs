@@ -54,8 +54,7 @@ pub fn open_friends_json_command(app_handle: tauri::AppHandle) -> Result<(), Str
         .app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {e}"))?;
 
-    fs::create_dir_all(&data_dir)
-        .map_err(|e| format!("Failed to create data directory: {e}"))?;
+    fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
 
     let friends_file = data_dir.join("friends.json");
 
