@@ -35,6 +35,7 @@ pub fn run() {
             commands::friends::delete_friend_command,
             commands::windows::open_settings_window_command,
             commands::windows::open_new_friend_window_command,
+            commands::systems::open_friends_json_command,
             commands::systems::read_image_as_base64_command,
             commands::systems::enable_autostart_command,
             commands::systems::disable_autostart_command,

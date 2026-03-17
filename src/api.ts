@@ -62,4 +62,8 @@ export namespace api {
     export async function exit_app(): Promise<void> {
         await invoke('exit_app_command');
     }
+
+    export async function openFriendsJson(): Promise<void> {
+        await invoke('open_friends_json_command');
+    }
 }

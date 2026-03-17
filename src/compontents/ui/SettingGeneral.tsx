@@ -172,6 +172,18 @@ export default function SettingGeneral(props: { startup?: boolean; calendarView?
                 </button>
             </SettingsRow>
 
+            <SettingsRow
+                label="Config File"
+                description="Reveal the friends.json config file in Finder."
+            >
+                <button
+                    className="border border-gray-300 rounded-md px-2 text-[12px] text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1"
+                    onClick={() => api.openFriendsJson()}
+                >
+                    Reveal in Finder
+                </button>
+            </SettingsRow>
+
             <SettingsRow label="Quit Application">
                 <button
                     onClick={api.exit_app}
