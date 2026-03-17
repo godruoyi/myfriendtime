@@ -1,7 +1,9 @@
 use base64::{engine::general_purpose, Engine as _};
 use std::{fs, path::Path};
 use tauri::AppHandle;
+use tauri::Manager;
 use tauri_plugin_autostart::ManagerExt;
+use tauri_plugin_opener::OpenerExt;
 
 #[tauri::command]
 pub fn exit_app_command(app_handle: tauri::AppHandle) {
@@ -44,6 +46,28 @@ pub async fn is_autostart_enabled_command(app_handle: AppHandle) -> Result<bool,
             Err(format!("Failed to check autostart status: {e}"))
         }
     }
+}
+
+#[tauri::command]
+pub fn open_friends_json_command(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {e}"))?;
+
+    fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
+
+    let friends_file = data_dir.join("friends.json");
+
+    if !friends_file.exists() {
+        fs::write(&friends_file, "[]")
+            .map_err(|e| format!("Failed to create friends.json: {e}"))?;
+    }
+
+    app_handle
+        .opener()
+        .reveal_item_in_dir(&friends_file)
+        .map_err(|e| format!("Failed to reveal friends.json: {e}"))
 }
 
 #[tauri::command]
